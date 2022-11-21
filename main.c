@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
     srand(time(NULL));
 
     // You may change this code; this is for demonstration purposes
-    //BuildingType building;
-    //initBuilding(&building);
+    BuildingType building;
+    initBuilding(&building);
     //populateRooms(&building);
 
     char names[MAX_HUNTERS][MAX_STR];

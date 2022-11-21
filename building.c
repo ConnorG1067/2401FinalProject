@@ -1,6 +1,5 @@
 
 #include "defs.h"
-
 /*
     Note: While this function is provided, you will likely want
     to modify it to suit your solution. This has been provided
@@ -106,4 +105,9 @@ void populateRooms(BuildingType* building) {
     connectRooms(kitchen, living_room);
     connectRooms(kitchen, garage);
     connectRooms(garage, utility_room);
+}
+
+void initBuilding(BuildingType *building){
+    building->ghost = NULL;
+    building->rooms = NULL;
 }
