@@ -21,33 +21,31 @@ typedef enum { POLTERGEIST, BANSHEE, BULLIES, PHANTOM } GhostClassType;
 int randInt(int, int);          // Generates a pseudorandom integer between the parameters
 float randFloat(float, float);  // Generates a pseudorandom float between the parameters
 
-void populateRooms(BuildingType*);   // Populates the building with sample data for rooms
-
 //Entity types
 typedef struct {
     char name[MAX_STR];
-    RoomListType* connectedRooms;
-    GhostEvidenceList* evidenceList;
-    HunterType hunters[MAX_HUNTERS];
-    GhostType* ghost;
+    struct RoomListType* connectedRooms;
+    struct GhostEvidenceList* evidenceList;
+    struct HunterType *hunters[MAX_HUNTERS];
+    struct GhostType* ghost;
 } RoomType;
 
 typedef struct {
-    GhostType* ghost;
-    HunterType* hunters[MAX_HUNTERS];
-    RoomListType* rooms;
+    struct GhostType* ghost;
+    struct HunterType* hunters[MAX_HUNTERS];
+    struct RoomListType* rooms;
 } BuildingType;
 
 typedef struct Ghost{
   GhostClassType *ghostType;
-  RoomType *room;
+  struct RoomType *room;
   int boredomTimer; // initialize to BOREDOM_MAX
 } GhostType;
 
 typedef struct Hunter {
-  RoomType *room;
+  struct RoomType *room;
   EvidenceClassType *evidence;
-  GhostEvidenceList *personalEvidence;
+  struct GhostEvidenceList *personalEvidence;
   char name[MAX_STR];
   int fear;   // Init to zero
   int timer;  // Init to BOREDOM_MAX
@@ -55,7 +53,7 @@ typedef struct Hunter {
 
 //NodeTypes
 typedef struct RoomNode{
-    RoomType* data;
+    struct RoomType* data;
     struct RoomNode* next;
 } RoomNodeType;
 
@@ -65,21 +63,19 @@ typedef struct Evidence {
 } EvidenceType;
 
 typedef struct EvidenceNode{
-    EvidenceType* data;
-    struct EvidenceNode* next;`
+    struct EvidenceType* data;
+    struct EvidenceNode* next;
 } EvidenceNodeType;
 
 //LinkedListTypes
 typedef struct GhostEvidenceList{
-    EvidenceNode* head;
-    EvidenceNode* tail;
+    struct EvidenceNode* head;
+    struct EvidenceNode* tail;
 } GhostEvidenceListType;
 
 typedef struct RoomList{
-    RyomNode* head;
-    RoomNode* tail;
+    struct RoomNode* head;
+    struct RoomNode* tail;
 } RoomListType;
 
-
-
-
+void populateRooms(BuildingType*);   // Populates the building with sample data for rooms
