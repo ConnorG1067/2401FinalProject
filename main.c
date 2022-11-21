@@ -6,31 +6,20 @@ int main(int argc, char *argv[])
     srand(time(NULL));
 
     // You may change this code; this is for demonstration purposes
-<<<<<<< HEAD
-    //BuildingType building;
-    //initBuilding(&building);
-=======
     BuildingType building;
     initBuilding(&building);
->>>>>>> f4cbc6a6c70c40a6603fef817084a72aa692e605
     //populateRooms(&building);
 
     char names[MAX_HUNTERS][MAX_STR];
 
     for(int i = 0; i < MAX_HUNTERS; i++) {
-<<<<<<< HEAD
-        scanf("INPUT FUCKING NAME YOU FUCKING STUPID RETARD: %s", names[i]);
-    }
-=======
         printf("INPUT FUCKING NAME YOU FUCKING STUPID RETARD: ");
         scanf("%s", names[i]);
     }
     
->>>>>>> f4cbc6a6c70c40a6603fef817084a72aa692e605
 
     return 0;
 }
-
 
 /*
   Function:  randInt

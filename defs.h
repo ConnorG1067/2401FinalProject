@@ -21,27 +21,6 @@ typedef enum { POLTERGEIST, BANSHEE, BULLIES, PHANTOM } GhostClassType;
 int randInt(int, int);          // Generates a pseudorandom integer between the parameters
 float randFloat(float, float);  // Generates a pseudorandom float between the parameters
 
-//Entity types
-typedef struct {
-    char name[MAX_STR];
-    struct RoomListType* connectedRooms;
-    struct GhostEvidenceList* evidenceList;
-    struct HunterType *hunters[MAX_HUNTERS];
-    struct GhostType* ghost;
-} RoomType;
-
-typedef struct {
-    struct GhostType* ghost;
-    struct HunterType* hunters[MAX_HUNTERS];
-    struct RoomListType* rooms;
-} BuildingType;
-
-typedef struct Ghost{
-  GhostClassType *ghostType;
-  struct RoomType *room;
-  int boredomTimer; // initialize to BOREDOM_MAX
-} GhostType;
-
 typedef struct Hunter {
   struct RoomType *room;
   EvidenceClassType *evidence;
@@ -51,11 +30,23 @@ typedef struct Hunter {
   int timer;  // Init to BOREDOM_MAX
 } HunterType;
 
-//NodeTypes
-typedef struct RoomNode{
-    struct RoomType* data;
-    struct RoomNode* next;
-} RoomNodeType;
+//Entity types
+typedef struct Room{
+    char name[MAX_STR];
+    struct RoomListType* connectedRooms;
+    struct GhostEvidenceList* evidenceList;
+    HunterType *hunters[MAX_HUNTERS];
+    int hunterListSize;
+    struct GhostType* ghost;
+} RoomType;
+
+typedef struct Ghost{
+  GhostClassType *ghostType;
+  struct RoomType *room;
+  int boredomTimer; // initialize to BOREDOM_MAX
+} GhostType;
+
+
 
 typedef struct Evidence {
   EvidenceClassType *evidenceCategory;
@@ -63,20 +54,40 @@ typedef struct Evidence {
 } EvidenceType;
 
 typedef struct EvidenceNode{
-    struct EvidenceType* data;
+    EvidenceType* data;
     struct EvidenceNode* next;
 } EvidenceNodeType;
 
+//NodeTypes
+typedef struct RoomNode{
+    RoomType* data;
+    struct RoomNode* next;
+} RoomNodeType;
+
 //LinkedListTypes
 typedef struct GhostEvidenceList{
-    struct EvidenceNode* head;
-    struct EvidenceNode* tail;
+    EvidenceNodeType* head;
+    EvidenceNodeType* tail;
 } GhostEvidenceListType;
 
 typedef struct RoomList{
-    struct RoomNode* head;
-    struct RoomNode* tail;
+    RoomNodeType* head;
+    RoomNodeType* tail;
 } RoomListType;
+
+typedef struct {
+    GhostType* ghost;
+    HunterType* hunters[MAX_HUNTERS];
+    int hunterListSize;
+    RoomListType* rooms;
+} BuildingType;
 
 void populateRooms(BuildingType*);   // Populates the building with sample data for rooms
 void initBuilding(BuildingType*);
+void initRoom(RoomType*, char*);
+void initRoomList(RoomListType *);
+
+void initGhostList(GhostEvidenceListType *);
+void initGhost(GhostClassType *, RoomType*, GhostType *);
+
+

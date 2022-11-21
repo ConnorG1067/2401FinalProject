@@ -21,6 +21,7 @@ void populateRooms(BuildingType* building) {
     // in the init parameters?
     RoomType* van = calloc(1, sizeof(RoomType));
     initRoom(van, "Van");
+    /*
     RoomType* hallway = calloc(1, sizeof(RoomType));
     initRoom(hallway, "Hallway");
     RoomType* master_bedroom = calloc(1, sizeof(RoomType));
@@ -105,9 +106,11 @@ void populateRooms(BuildingType* building) {
     connectRooms(kitchen, living_room);
     connectRooms(kitchen, garage);
     connectRooms(garage, utility_room);
+    */
 }
 
 void initBuilding(BuildingType *building){
-    building->ghost = NULL;
-    building->rooms = NULL;
+    building->ghost = (GhostType*) malloc(sizeof(GhostType));
+    building->rooms = (RoomListType*) malloc(sizeof(RoomListType));
+    building->hunterListSize = 0; 
 }
