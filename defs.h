@@ -79,3 +79,4 @@ typedef struct RoomList{
 } RoomListType;
 
 void populateRooms(BuildingType*);   // Populates the building with sample data for rooms
+void initBuilding(BuildingType*);
