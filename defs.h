@@ -22,3 +22,64 @@ int randInt(int, int);          // Generates a pseudorandom integer between the 
 float randFloat(float, float);  // Generates a pseudorandom float between the parameters
 
 void populateRooms(BuildingType*);   // Populates the building with sample data for rooms
+
+//Entity types
+typedef struct {
+    char name[MAX_STR];
+    RoomListType* connectedRooms;
+    GhostEvidenceList* evidenceList;
+    HunterType hunters[MAX_HUNTERS];
+    GhostType* ghost;
+} RoomType;
+
+typedef struct {
+    GhostType* ghost;
+    HunterType* hunters[MAX_HUNTERS];
+    RoomListType* rooms;
+} BuildingType;
+
+typedef struct Ghost{
+  GhostClassType *ghostType;
+  RoomType *room;
+  int boredomTimer; // initialize to BOREDOM_MAX
+} GhostType;
+
+typedef struct Hunter {
+  RoomType *room;
+  EvidenceClassType *evidence;
+  GhostEvidenceList *personalEvidence;
+  char name[MAX_STR];
+  int fear;   // Init to zero
+  int timer;  // Init to BOREDOM_MAX
+} HunterType;
+
+//NodeTypes
+typedef struct RoomNode{
+    RoomType* data;
+    struct RoomNode* next;
+} RoomNodeType;
+
+typedef struct Evidence {
+  EvidenceClassType *evidenceCategory;
+  int readingData;
+} EvidenceType;
+
+typedef struct EvidenceNode{
+    EvidenceType* data;
+    struct EvidenceNode* next;`
+} EvidenceNodeType;
+
+//LinkedListTypes
+typedef struct GhostEvidenceList{
+    EvidenceNode* head;
+    EvidenceNode* tail;
+} GhostEvidenceListType;
+
+typedef struct RoomList{
+    RyomNode* head;
+    RoomNode* tail;
+} RoomListType;
+
+
+
+
