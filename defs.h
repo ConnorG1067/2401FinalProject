@@ -65,7 +65,7 @@ typedef struct RoomType{
     RoomListType* connectedRooms;
     GhostEvidenceListType* evidenceList;
     struct HunterListType *hunters;
-    struct GhostType* ghost;
+    struct GhostType *ghost;
 } RoomType;
 
 typedef struct HunterListType{
@@ -97,7 +97,7 @@ void initBuilding(BuildingType*);
 
 void initRoom(RoomType*, char*);
 void initRoomList(RoomListType**);
-void connectRooms(RoomNodeType*, RoomNodeType*);
+void connectRooms(RoomType*, RoomType*);
 void appendRoom(RoomListType*, RoomNodeType*);
 
 

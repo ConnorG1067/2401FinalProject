@@ -27,13 +27,24 @@ void initRoomList(RoomListType **roomList){
 
 //Connected the two rooms together
 //Uses append list to append each rooms connected rooms to both connectedRoomLists
-void connectRooms(RoomNodeType *room1, RoomNodeType *room2){
-    appendRoom(room1->data->connectedRooms, room2);
-    appendRoom(room2->data->connectedRooms, room1);
+void connectRooms(RoomType *room1, RoomType *room2){
+    RoomNodeType *roomNode1 = (RoomNodeType*) malloc(sizeof(RoomNodeType));
+    RoomNodeType *roomNode2 = (RoomNodeType*) malloc(sizeof(RoomNodeType));
+
+    roomNode1->data = room1;
+    roomNode2->data = room2;
+
+    roomNode1->next = NULL;
+    roomNode2->next = NULL;
+
+    
+    appendRoom(room1->connectedRooms, roomNode2);
+    appendRoom(room2->connectedRooms, roomNode1);
 }
 
 // Append a room to the end of a room list
 void appendRoom(RoomListType *roomList, RoomNodeType *room) {
+
     if(roomList->head == NULL) {
         roomList->head = room;
         roomList->tail = room;
