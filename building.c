@@ -1,4 +1,3 @@
-
 #include "defs.h"
 /*
     Note: While this function is provided, you will likely want
@@ -105,7 +104,6 @@ void populateRooms(BuildingType* building) {
     connectRooms(kitchen, living_room);
     connectRooms(kitchen, garage);
     connectRooms(garage, utility_room);
- 
 }
 
 void initBuilding(BuildingType *building){
