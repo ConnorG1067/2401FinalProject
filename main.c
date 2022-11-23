@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     // You may change this code; this is for demonstration purposes
     BuildingType building;
     initBuilding(&building);
-    //populateRooms(&building);
+    populateRooms(&building);
 
     char names[MAX_HUNTERS][MAX_STR];
 
@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
 
 /*
   Function:  randInt
