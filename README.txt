@@ -8,3 +8,6 @@ List of Files
 	- main.c
 	- defs.h
 	- building.c
+	- hunters.c
+	- ghost.c
+	
