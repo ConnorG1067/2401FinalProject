@@ -38,6 +38,7 @@ void *ghostThread(GhostType *currentGhost) {
             switch(pickAction) {
                 //Move to another room
                 case 0:
+                    //Make similar to hunters
                     int move = randomAdjacentRoom(currentGhost);
                     if(move > 0) {
                         moveGhost(currentGhost, move);

@@ -78,7 +78,7 @@ typedef struct RoomType{
 
 typedef struct HunterListType{
   int size;
-  HunterType hunterList[MAX_HUNTERS];
+  HunterType *hunterList[MAX_HUNTERS];
 } HunterListType;
 
 
@@ -123,5 +123,11 @@ void moveGhost(GhostType*, int);
 int randomAdjacentRoom(GhostType*);
 int checkGhostInRoom(GhostType*);
 
+//Hunter Thread Helpers
 int checkHunterWithGhost(HunterType*);
 int containsThreeEvidence(HunterType*);
+int communicateEvidence(HunterType*);
+void collectEvidence(HunterType*);
+int moveHunter(HunterType*);
+void addEvidenceToHunter(GhostEvidenceListType*, EvidenceNodeType*);
+void removeEvidenceFromRoom(GhostEvidenceListType *, EvidenceNodeType *);

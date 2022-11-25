@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     char names[MAX_HUNTERS][MAX_STR];
 
     for(int i = 0; i < MAX_HUNTERS; i++) {
-        printf("INPUT FUCKING NAME YOU FUCKING STUPID RETARD: ");
+        printf("Hunter #%d: ", i+1);        
         scanf("%s", names[i]);
     }
 
