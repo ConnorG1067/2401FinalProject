@@ -5,6 +5,10 @@ int main(int argc, char *argv[])
     // Initialize a random seed for the random number generators
     srand(time(NULL));
 
+    pthread_t ghost;
+
+    //pthread_create(&ghost, NULL, ghostShit, "t1: tic");
+
     // You may change this code; this is for demonstration purposes
     BuildingType building;
     initBuilding(&building);
@@ -16,7 +20,11 @@ int main(int argc, char *argv[])
         printf("INPUT FUCKING NAME YOU FUCKING STUPID RETARD: ");
         scanf("%s", names[i]);
     }
-    
+
+    pthread_join(ghost, NULL);
+
+    //pthread_exit(NULL)
+
 
     return 0;
 }
@@ -46,3 +54,6 @@ float randFloat(float a, float b) {
     // Scale it to the range we want, and shift it
     return random * (b - a) + a;
 }
+
+
+
