@@ -14,6 +14,14 @@
 #define USLEEP_TIME     50000
 #define BOREDOM_MAX        99
 
+#define C_TRUE              1
+#define C_FALSE             0
+
+#define C_MISC_ERROR       -1
+#define C_NO_ROOM_ERROR    -2
+#define C_ARR_ERROR        -3
+
+
 // You may rename these types if you wish
 typedef enum { EMF, TEMPERATURE, FINGERPRINTS, SOUND } EvidenceClassType;
 typedef enum { POLTERGEIST, BANSHEE, BULLIES, PHANTOM } GhostClassType;
@@ -46,7 +54,7 @@ typedef struct RoomList{
 
 typedef struct HunterType {
   struct RoomType *room;
-  EvidenceClassType *evidence;
+  EvidenceClassType evidence;
   struct GhostEvidenceListType *personalEvidence;
   char name[MAX_STR];
   int fear;   // Init to zero
@@ -74,8 +82,8 @@ typedef struct HunterListType{
 } HunterListType;
 
 
-typedef struct Evidence {
-  EvidenceClassType *evidenceCategory;
+typedef struct EvidenceType {
+  EvidenceClassType evidenceCategory;
   int readingData;
 } EvidenceType;
 
@@ -103,5 +111,16 @@ void appendRoom(RoomListType*, RoomNodeType*);
 
 void initGhostList(GhostEvidenceListType *);
 void initGhost(GhostClassType *, RoomType*, GhostType *);
+
+//Threads
+void *ghostThread(GhostType *);
+void *hunterThread();
+
+//Ghost Thread Helpers
+void addRandomEvidence(GhostType*);
+int generateValueOnType(EvidenceClassType);
+void moveGhost(GhostType*, int);
+int randomAdjacentRoom(GhostType*);
+int checkGhostInRoom(GhostType*);
 
 
