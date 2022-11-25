@@ -1,4 +1,3 @@
-
 #include "defs.h"
 /*
     Note: While this function is provided, you will likely want
@@ -21,7 +20,6 @@ void populateRooms(BuildingType* building) {
     // in the init parameters?
     RoomType* van = calloc(1, sizeof(RoomType));
     initRoom(van, "Van");
-    /*
     RoomType* hallway = calloc(1, sizeof(RoomType));
     initRoom(hallway, "Hallway");
     RoomType* master_bedroom = calloc(1, sizeof(RoomType));
@@ -49,31 +47,31 @@ void populateRooms(BuildingType* building) {
 
     // Now create a linked list of rooms using RoomNodeType in the Building
     RoomNodeType* van_node = calloc(1, sizeof(RoomNodeType));
-    van_node->room = van;
+    van_node->data = van;
     RoomNodeType* hallway_node = calloc(1, sizeof(RoomNodeType));
-    hallway_node->room = hallway;
+    hallway_node->data = hallway;
     RoomNodeType* master_bedroom_node = calloc(1, sizeof(RoomNodeType));
-    master_bedroom_node->room = master_bedroom;
+    master_bedroom_node->data = master_bedroom;
     RoomNodeType* boys_bedroom_node = calloc(1, sizeof(RoomNodeType));
-    boys_bedroom_node->room = boys_bedroom;
+    boys_bedroom_node->data = boys_bedroom;
     RoomNodeType* bathroom_node = calloc(1, sizeof(RoomNodeType));
-    bathroom_node->room = bathroom;
+    bathroom_node->data = bathroom;
     RoomNodeType* basement_node = calloc(1, sizeof(RoomNodeType));
-    basement_node->room = basement;
+    basement_node->data = basement;
     RoomNodeType* basement_hallway_node = calloc(1, sizeof(RoomNodeType));
-    basement_hallway_node->room = basement_hallway;
+    basement_hallway_node->data = basement_hallway;
     RoomNodeType* right_storage_room_node = calloc(1, sizeof(RoomNodeType));
-    right_storage_room_node->room = right_storage_room;
+    right_storage_room_node->data = right_storage_room;
     RoomNodeType* left_storage_room_node = calloc(1, sizeof(RoomNodeType));
-    left_storage_room_node->room = left_storage_room;
+    left_storage_room_node->data = left_storage_room;
     RoomNodeType* kitchen_node = calloc(1, sizeof(RoomNodeType));
-    kitchen_node->room = kitchen;
+    kitchen_node->data = kitchen;
     RoomNodeType* living_room_node = calloc(1, sizeof(RoomNodeType));
-    living_room_node->room = living_room;
+    living_room_node->data = living_room;
     RoomNodeType* garage_node = calloc(1, sizeof(RoomNodeType));
-    garage_node->room = garage;
+    garage_node->data = garage;
     RoomNodeType* utility_room_node = calloc(1, sizeof(RoomNodeType));
-    utility_room_node->room = utility_room;
+    utility_room_node->data = utility_room;
 
     // Building->rooms might be a linked list structre, or maybe just a node.
     initRoomList(&building->rooms);
@@ -106,7 +104,6 @@ void populateRooms(BuildingType* building) {
     connectRooms(kitchen, living_room);
     connectRooms(kitchen, garage);
     connectRooms(garage, utility_room);
-    */
 }
 
 void initBuilding(BuildingType *building){
