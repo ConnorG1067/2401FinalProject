@@ -17,12 +17,12 @@ void *hunterThread(HunterType *currentHunter) {
     //  OR fear level is greater than or equal to 100
     //  OR if boredom timer is <= 0
     // Exit the while loop, thus exiting the thread.
-    while(!containsThreeEvidence() && !(currentHunter->fear >= 100) && !(currentHunter->timer <= 0)) {
+    while(!containsThreeEvidence(currentHunter) && !(currentHunter->fear >= 100) && !(currentHunter->timer <= 0)) {
         if(checkHunterWithGhost(currentHunter)) {
             currentHunter->fear++;
             currentHunter->timer = BOREDOM_MAX;
         } else {
-            int hunterChoice = randInt(0,3)
+            int hunterChoice = randInt(0,3);
             // Randomly (or using our own programmed logic) either 
             //  collect evidence
             //  move

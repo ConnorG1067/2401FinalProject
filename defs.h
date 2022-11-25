@@ -55,7 +55,7 @@ typedef struct RoomList{
 typedef struct HunterType {
   struct RoomType *room;
   EvidenceClassType evidence;
-  struct GhostEvidenceListType *personalEvidence;
+  GhostEvidenceListType *personalEvidence;
   char name[MAX_STR];
   int fear;   // Init to zero
   int timer;  // Init to BOREDOM_MAX
@@ -123,4 +123,5 @@ void moveGhost(GhostType*, int);
 int randomAdjacentRoom(GhostType*);
 int checkGhostInRoom(GhostType*);
 
-
+int checkHunterWithGhost(HunterType*);
+int containsThreeEvidence(HunterType*);
