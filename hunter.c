@@ -1,14 +1,42 @@
 #include "defs.h"
 
-void initHunter(RoomType *room, EvidenceClassType evidence,  GhostEvidenceListType* personalEvidence, char* name, int fear, int timer, HunterType *hunter) {
+void initHunter(char* name, RoomType *room, HunterType *hunter) {
+    //Iit name
     strcpy(hunter->name, name);
-    hunter->evidence = evidence;
+
+    //Give them a random evidence tool
+    int randomEvidence = randInt(0, 4);
+    hunter->evidence = (EvidenceClassType) randomEvidence;
+
+    hunter->room = room;
+
+    //Init personal evidence
+    GhostEvidenceListType evidenceList;
+    GhostEvidenceListType *evidenceListPtr = &evidenceList;
+    initPersonalEvidence(evidenceListPtr);
+    hunter->personalEvidence;
+    
+    // Initialize fear and boredom timer to initial values
     hunter->fear = 0;
     hunter->timer = BOREDOM_MAX;
 }  
 
+void initPersonalEvidence(GhostEvidenceListType* evidenceList){
+    evidenceList->head = NULL;
+    evidenceList->tail = NULL;
+}
+
 void initHunterList(HunterListType *hunters) {
     hunters->size = 0;
+}
+
+int addHunterToList(HunterListType* hunters, HunterType* hunter){
+    if(hunters->size<MAX_HUNTERS){
+        hunters->hunterList[hunters->size++] = hunter;
+        return C_TRUE;
+    }else{
+        return C_FALSE;
+    }
 }
 
 void *hunterThread(HunterType *currentHunter) {

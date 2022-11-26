@@ -7,23 +7,45 @@ int main(int argc, char *argv[])
 
     pthread_t ghost;
 
-    //pthread_create(&ghost, NULL, ghostShit, "t1: tic");
+   
 
     // You may change this code; this is for demonstration purposes
     BuildingType building;
     initBuilding(&building);
     populateRooms(&building);
 
-    char names[MAX_HUNTERS][MAX_STR];
 
+    //Place hunters
+    HunterListType hunterList;
+    HunterListType* hunterListPtr = &hunterList;
+    initHunterList(hunterListPtr);
+
+    RoomType* vanRoom = building.rooms->head->data;
+
+    // GhostType currentGhost;
+    // GhostType *ghostPtr = &currentGhost;
+
+    // ghostPtr->room = building.rooms->head;
+    // ghostPtr->ghostType = POLTERGEIST;
+    // ghostPtr->boredomTimer = 100
+    
     for(int i = 0; i < MAX_HUNTERS; i++) {
-        printf("Hunter #%d: ", i+1);        
-        scanf("%s", names[i]);
+        printf("Hunter #%d: ", i+1);
+        char* name;
+        scanf("%s", name);
+        
+        HunterType currentHunter;
+        initHunter(name, vanRoom, &currentHunter);
+        addHunterToList(hunterListPtr, &currentHunter);
+        addHunterToRoom(vanRoom, &currentHunter);
     }
+
+    pthread_create(&ghost, NULL, ghostThread, (void*) &building);
 
     pthread_join(ghost, NULL);
 
-    //pthread_exit(NULL)
+    //pthread_exit(NULL);
+
 
 
     return 0;

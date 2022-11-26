@@ -11,42 +11,67 @@ void initGhostList(GhostEvidenceListType *ghostEvidenceList){
     ghostEvidenceList->tail = NULL;
 }
 
-
 /*
     Main ghost thread function
 */
-void *ghostThread(GhostType *currentGhost) {
-    int isNotBored = 1;
-    int pickAction = randInt(0,2);
 
+RoomNodeType* getRandomRoom(RoomNodeType *head){
+    int randomRoomInt = randInt(1, TOTAL_ROOMS);
+    RoomNodeType *traverseRoomNode = head;
+    for(int i = 0; i<randomRoomInt; i++){
+        traverseRoomNode = traverseRoomNode->next;
+    }
+    return traverseRoomNode;
+}
+
+// GhostClassType getRandomGhostType() {
+//     return (GhostClassType) randInt(0,5)
+// }
+
+void *ghostThread(void *arg) {
+    BuildingType *gThreadBuilding = (BuildingType*) arg;
+
+
+
+    GhostType *ghostPtr = (GhostType*) malloc(sizeof(GhostType));
+
+
+    initGhost(POLTERGEIST, getRandomRoom(gThreadBuilding->rooms->head)->data, ghostPtr);
+    printf("Room Name: %s", ghostPtr->room->name);
+
+    
     //If the ghost is the room with a hunter reset bordin timer to boredom_max and it cannot move
-    while(isNotBored) {
-        if(!isNotBored){
-            //End somehow
-        }
+    while(ghostPtr->boredomTimer > 0) {
         //Ghost is in a room with a hunter
-        if(checkGhostInRoom(currentGhost)){
-            currentGhost->boredomTimer = BOREDOM_MAX;
+        if(checkGhostInRoom(ghostPtr)){
+            int pickAction = randInt(0,2);
+            printf("In Room: %d\n", ghostPtr->boredomTimer);
+            ghostPtr->boredomTimer = BOREDOM_MAX;
             if(pickAction) {
-                addRandomEvidence(currentGhost);
+                addRandomEvidence(ghostPtr);
             }
         //Ghost is not in a room with a hunter
         }else{
+            int pickAction2 = randInt(0,3);
+            printf("NOT In Room: %d\n", ghostPtr->boredomTimer);
             //Decrease bordom
-            currentGhost->boredomTimer--;
+            ghostPtr->boredomTimer--;
             //Pick an action
-            switch(pickAction) {
+            switch(pickAction2) {
                 //Move to another room
                 case 0:
                     //Make similar to hunters
-                    int move = randomAdjacentRoom(currentGhost);
+                    int move = randomAdjacentRoom(ghostPtr);
                     if(move > 0) {
-                        moveGhost(currentGhost, move);
+                        moveGhost(ghostPtr, move);
                     }
                     break;
                 // leave evidence
-                case 2: 
-                    addRandomEvidence(currentGhost);
+                case 1: 
+                    addRandomEvidence(ghostPtr);
+                    break;
+                // Do Nothing
+                case 2:
                     break;
             }
         }
@@ -58,20 +83,31 @@ void *ghostThread(GhostType *currentGhost) {
 */
 void addRandomEvidence(GhostType *currentGhost) {
     //Generate new evidence
-    EvidenceNodeType *evidenceNode;
+    EvidenceNodeType *evidenceNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
     
-    EvidenceType *newEvidence;
+    EvidenceType newEvidence;
+    EvidenceType *newEvidencePtr = &newEvidence;
     int randomEvidence = randInt(0, 4);
-    newEvidence->evidenceCategory = (EvidenceClassType) randomEvidence;
+    newEvidencePtr->evidenceCategory = (EvidenceClassType) randomEvidence;
     //Probably change later, def shouldnt be this
-    newEvidence->readingData = generateValueOnType(newEvidence->evidenceCategory);
+    newEvidencePtr->readingData = generateValueOnType(newEvidencePtr->evidenceCategory);
 
-    evidenceNode->data = newEvidence;
+    evidenceNode->data = newEvidencePtr;
     evidenceNode->next = NULL;
     
     //Set the evidenceList to new evidence
-    currentGhost->room->evidenceList->tail->next = evidenceNode;
-    currentGhost->room->evidenceList->tail = evidenceNode;
+    if(currentGhost->room->evidenceList->head == NULL){
+        currentGhost->room->evidenceList->head = evidenceNode;
+        currentGhost->room->evidenceList->tail = evidenceNode;
+    }else if (currentGhost->room->evidenceList->head == currentGhost->room->evidenceList->tail){
+        currentGhost->room->evidenceList->head->next = evidenceNode;
+        currentGhost->room->evidenceList->tail = evidenceNode;
+    }else{
+        currentGhost->room->evidenceList->tail->next = evidenceNode;
+        currentGhost->room->evidenceList->tail = evidenceNode;
+    }
+
+    
     return;
 }
 

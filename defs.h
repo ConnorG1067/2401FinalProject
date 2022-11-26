@@ -13,6 +13,7 @@
 #define MAX_HUNTERS         4
 #define USLEEP_TIME     50000
 #define BOREDOM_MAX        99
+#define TOTAL_ROOMS        13
 
 #define C_TRUE              1
 #define C_FALSE             0
@@ -35,13 +36,11 @@ typedef struct EvidenceNode{
     struct EvidenceNode* next;
 } EvidenceNodeType;
 
-//NodeTypes
 typedef struct RoomNode{
     struct RoomType* data;
     struct RoomNode* next;
 } RoomNodeType;
 
-//LinkedListTypes
 typedef struct GhostEvidenceList{
     EvidenceNodeType* head;
     EvidenceNodeType* tail;
@@ -67,7 +66,6 @@ typedef struct GhostType{
   int boredomTimer; // initialize to BOREDOM_MAX
 } GhostType;
 
-//Entity types
 typedef struct RoomType{
     char name[MAX_STR];
     RoomListType* connectedRooms;
@@ -87,7 +85,6 @@ typedef struct EvidenceType {
   int readingData;
 } EvidenceType;
 
-
 typedef struct {
     GhostType* ghost;
     HunterType* hunters[MAX_HUNTERS];
@@ -96,34 +93,41 @@ typedef struct {
 } BuildingType;
 
 
-//PROVIDED FUNTIONS
+// PROVIDED FUNTIONS
 void populateRooms(BuildingType*);
 
-//INIT FUNCTIONS
+// INIT FUNCTIONS
 void initHunterList(HunterListType*);
 void initBuilding(BuildingType*);
-
 void initRoom(RoomType*, char*);
 void initRoomList(RoomListType**);
-void connectRooms(RoomType*, RoomType*);
-void appendRoom(RoomListType*, RoomNodeType*);
-
-
 void initGhostList(GhostEvidenceListType *);
 void initGhost(GhostClassType *, RoomType*, GhostType *);
+void initPersonalEvidence(GhostEvidenceListType* );
+void initHunter(char* , RoomType *, HunterType *);
 
-//Threads
-void *ghostThread(GhostType *);
+
+// THREADS
+void *ghostThread();
 void *hunterThread();
 
-//Ghost Thread Helpers
+// MISC FUNCTIONS
+void connectRooms(RoomType*, RoomType*);
+void appendRoom(RoomListType*, RoomNodeType*);
+int addHunterToList(HunterListType*, HunterType*);
+int addHunterToRoom(RoomType*, HunterType*);
+RoomNodeType* getRandomRoom(RoomNodeType*);
+
+GhostClassType getRandomGhostType();
+
+// GHOST THREAD HELPERS
 void addRandomEvidence(GhostType*);
 int generateValueOnType(EvidenceClassType);
 void moveGhost(GhostType*, int);
 int randomAdjacentRoom(GhostType*);
 int checkGhostInRoom(GhostType*);
 
-//Hunter Thread Helpers
+// HUNTER THREAD HELPERS
 int checkHunterWithGhost(HunterType*);
 int containsThreeEvidence(HunterType*);
 int communicateEvidence(HunterType*);
