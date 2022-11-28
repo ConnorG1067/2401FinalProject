@@ -56,13 +56,11 @@ void appendRoom(RoomListType *roomList, RoomNodeType *room) {
     return;
 }
 
-int addHunterToRoom(RoomType* room, HunterType* hunter){
+int addHunterToRoom(RoomType* room, HunterType* hunter) {
     if(room->hunters->size<MAX_HUNTERS){
         room->hunters->hunterList[room->hunters->size++] = hunter;
         return C_TRUE;
     }else{
         return C_FALSE;
     }
-
-
 }

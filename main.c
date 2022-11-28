@@ -2,10 +2,16 @@
 
 int main(int argc, char *argv[])
 {
+
     // Initialize a random seed for the random number generators
     srand(time(NULL));
 
+    //Ghost thread
     pthread_t ghost;
+
+    
+
+
 
    
 
@@ -31,18 +37,40 @@ int main(int argc, char *argv[])
     
     for(int i = 0; i < MAX_HUNTERS; i++) {
         printf("Hunter #%d: ", i+1);
-        char* name;
+        char name[MAX_STR];
         scanf("%s", name);
         
-        HunterType currentHunter;
-        initHunter(name, vanRoom, &currentHunter);
-        addHunterToList(hunterListPtr, &currentHunter);
-        addHunterToRoom(vanRoom, &currentHunter);
+        HunterType *currentHunterPtr = (HunterType*) malloc(sizeof(HunterType));
+        initHunter(name, vanRoom, &currentHunterPtr);
+        addHunterToList(hunterListPtr, currentHunterPtr);
+        addHunterToRoom(vanRoom, currentHunterPtr);
     }
 
-    pthread_create(&ghost, NULL, ghostThread, (void*) &building);
+    //Populate a hunter thread array
+    pthread_t hunterThreadArray[hunterListPtr->size];
+    for(int i = 0; i<hunterListPtr->size; i++){
+        pthread_t currentThread;
+        hunterThreadArray[i] = currentThread;
 
-    pthread_join(ghost, NULL);
+    }
+
+    //pthread_create(&ghost, NULL, ghostThread, (void*) &building);
+
+    //Create them
+    for(int i = 0; i<hunterListPtr->size; i++) {
+        pthread_create(&hunterThreadArray[i], NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
+    }
+
+    
+    // Join ghost thread
+    //pthread_join(ghost, NULL);
+
+    // Join hunter threads
+    for(int i = 0; i<hunterListPtr->size; i++) {
+        pthread_join(hunterThreadArray[i], NULL);
+    }
+
+
 
     //pthread_exit(NULL);
 

@@ -31,14 +31,10 @@ RoomNodeType* getRandomRoom(RoomNodeType *head){
 void *ghostThread(void *arg) {
     BuildingType *gThreadBuilding = (BuildingType*) arg;
 
-
-
     GhostType *ghostPtr = (GhostType*) malloc(sizeof(GhostType));
-
-
     initGhost(POLTERGEIST, getRandomRoom(gThreadBuilding->rooms->head)->data, ghostPtr);
-    printf("Room Name: %s", ghostPtr->room->name);
 
+    // printf("Room Name: %s", ghostPtr->room->name);
     
     //If the ghost is the room with a hunter reset bordin timer to boredom_max and it cannot move
     while(ghostPtr->boredomTimer > 0) {

@@ -1,24 +1,43 @@
 #include "defs.h"
 
-void initHunter(char* name, RoomType *room, HunterType *hunter) {
+
+// void initGhost(int id, GhostEnumType gt, RoomType *r, float like, GhostType **ghost){
+// 	//Allocate memory for the ghost	
+// 	GhostType *ghostPointer = malloc(sizeof(GhostType));
+
+// 	//Set Fields
+// 	ghostPointer->id = id;
+// 	ghostPointer->ghostType = gt;
+// 	ghostPointer->room = r;
+// 	ghostPointer->likelihood = like;
+
+// 	//Set the pointer to the new ghost pointer
+// 	*ghost = ghostPointer;
+	
+// }
+void initHunter(char* name, RoomType *room, HunterType **hunter) {
     //Iit name
-    strcpy(hunter->name, name);
+    HunterType *hunterPtr = (HunterType*) malloc(sizeof(HunterType));
+
+    strcpy(hunterPtr->name, name);
 
     //Give them a random evidence tool
     int randomEvidence = randInt(0, 4);
-    hunter->evidence = (EvidenceClassType) randomEvidence;
+    hunterPtr->evidence = (EvidenceClassType) randomEvidence;
 
-    hunter->room = room;
+    hunterPtr->room = room;
 
     //Init personal evidence
-    GhostEvidenceListType evidenceList;
-    GhostEvidenceListType *evidenceListPtr = &evidenceList;
+    GhostEvidenceListType *evidenceListPtr = (GhostEvidenceListType*) malloc(sizeof(GhostEvidenceListType));
     initPersonalEvidence(evidenceListPtr);
-    hunter->personalEvidence;
+    hunterPtr->personalEvidence;
+    if(hunterPtr->personalEvidence->head == NULL){
+        printf("YO");
+    }
     
     // Initialize fear and boredom timer to initial values
-    hunter->fear = 0;
-    hunter->timer = BOREDOM_MAX;
+    hunterPtr->fear = 0;
+    hunterPtr->timer = BOREDOM_MAX;
 }  
 
 void initPersonalEvidence(GhostEvidenceListType* evidenceList){
@@ -39,16 +58,18 @@ int addHunterToList(HunterListType* hunters, HunterType* hunter){
     }
 }
 
-void *hunterThread(HunterType *currentHunter) {
+void *hunterThread(void *arg) {
 
+
+    HunterType *hThreadHunter = (HunterType*) arg;
     // Exit if there are three different pieces of evidence
     //  OR fear level is greater than or equal to 100
     //  OR if boredom timer is <= 0
     // Exit the while loop, thus exiting the thread.
-    while(!(containsThreeEvidence(currentHunter) || (currentHunter->fear >= 100) || (currentHunter->timer <= 0))) {
-        if(checkHunterWithGhost(currentHunter)) {
-            currentHunter->fear++;
-            currentHunter->timer = BOREDOM_MAX;
+    while(!(containsThreeEvidence(hThreadHunter) || (hThreadHunter->fear >= 100) || (hThreadHunter->timer <= 0))) {
+        if(checkHunterWithGhost(hThreadHunter)) {
+            hThreadHunter->fear++;
+            hThreadHunter->timer = BOREDOM_MAX;
         }
 
         int hunterChoice = randInt(0,3);
@@ -56,17 +77,16 @@ void *hunterThread(HunterType *currentHunter) {
         switch(hunterChoice){
             case 0:
                 //Collect Evidence
-                collectEvidence(currentHunter);
+                collectEvidence(hThreadHunter);
                 break;
             
             case 1:
                 //Move
-                moveHunter(currentHunter);
+                moveHunter(hThreadHunter);
                 break;
-            
             case 2:
                 //Communicate
-                communicateEvidence(currentHunter);
+                communicateEvidence(hThreadHunter);
                 break;
 
         }
@@ -92,6 +112,10 @@ int checkHunterWithGhost(HunterType *currentHunter) {
 int containsThreeEvidence(HunterType *currentHunter) {
 
     int evidenceCounter = 0;
+    printf("HERE\n");
+    if(currentHunter->personalEvidence->head == NULL){
+        return C_FALSE;
+    }
     EvidenceNodeType *tempEvidenceNode = currentHunter->personalEvidence->head;
 
     if(currentHunter->personalEvidence->head != NULL) {
@@ -126,32 +150,36 @@ int communicateEvidence(HunterType *currentHunter) {
     //Hunter in room --> currentHunter
     while(hunterTraverseNode != NULL){
 
-        //Make a new node
-        EvidenceNodeType *deepCopyEvNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
-        //Might share the same data cuz they're pointers
-        //Future problem: make a copy room function
-        //Set the currentDeepCopyNode's data to the hunter's tempNode data
-        deepCopyEvNode->data = hunterTraverseNode->data;
-        deepCopyEvNode->next = NULL;
+        //if ghostly
+        if(isGhostly(hunterTraverseNode->data)){
+            //make a new node
+            EvidenceNodeType *deepCopyEvNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
+            //Might share the same data cuz they're pointers
+            //Future problem: make a copy room function
+            //Set the currentDeepCopyNode's data to the hunter's tempNode data
+            deepCopyEvNode->data = hunterTraverseNode->data;
+            deepCopyEvNode->next = NULL;
 
-        addEvidenceToHunter(currentHunter->personalEvidence, deepCopyEvNode);
-        hunterTraverseNode = hunterTraverseNode->next;
+            addEvidenceToHunter(currentHunter->personalEvidence, deepCopyEvNode);
+            hunterTraverseNode = hunterTraverseNode->next;
+        }
+       
     }
     
     //currentHunter --> Hunter in room 
     while(currentHunterTraverseNode != NULL){
-        //Make a new node
-        EvidenceNodeType *deepCopyEvNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
-        //Might share the same data cuz they're pointers
-        //Future problem: make a copy room function
-        deepCopyEvNode->data = currentHunterTraverseNode->data;
-        deepCopyEvNode->next = NULL;
+        if(isGhostly(currentHunterTraverseNode->data)){
+            //Make a new node
+            EvidenceNodeType *deepCopyEvNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
+            //Might share the same data cuz they're pointers
+            //Future problem: make a copy room function
+            deepCopyEvNode->data = currentHunterTraverseNode->data;
+            deepCopyEvNode->next = NULL;
 
-        addEvidenceToHunter(hunterToCommunicate->personalEvidence, deepCopyEvNode);
-        currentHunterTraverseNode = currentHunterTraverseNode->next;
-
+            addEvidenceToHunter(hunterToCommunicate->personalEvidence, deepCopyEvNode);
+            currentHunterTraverseNode = currentHunterTraverseNode->next;
+        }
     }
-    
     return C_TRUE;
 }
 
@@ -175,9 +203,22 @@ int moveHunter(HunterType* currentHunter){
         randomRoomNode->next = randomRoomNode;
     }
 
-    //Set the currentHunters room to the randomRoomNode
+    //Remove the current hunter from his previous room
+    int size = currentHunter->room->hunters->size;
+    for(int i = 0; i<size; i++){
+        if(currentHunter->room->hunters->hunterList[i] == currentHunter){
+            for(int j = i+1; j<size; j++){
+                currentHunter->room->hunters->hunterList[j-1] = currentHunter->room->hunters->hunterList[j];
+            }
+            i = size;
+        }
+    }
+
+    //Add him to the new room
+    addHunterToRoom(randomRoomNode->data, currentHunter);
     currentHunter->room = randomRoomNode->data;
-    
+
+    currentHunter->timer--;
 
     return C_TRUE;
 }
@@ -189,32 +230,74 @@ int moveHunter(HunterType* currentHunter){
 void collectEvidence(HunterType *currentHunter) {
     EvidenceNodeType *tempEvidence = currentHunter->room->evidenceList->head;
 
-    while(tempEvidence != currentHunter->room->evidenceList->tail) {
+    if(currentHunter->room->evidenceList->head == NULL) {
+        // give him random standard evidence of his tool type
+        // MAKE INIT FUNCTION
+        EvidenceNodeType *newEvidence = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
+        newEvidence->data->evidenceCategory = currentHunter->evidence;
+        newEvidence->data->readingData = generateStandardValue(newEvidence->data->evidenceCategory);
+        newEvidence->next = NULL;
+        // Create newEvidence, give it a standard value
+        addEvidenceToHunter(currentHunter->personalEvidence, newEvidence);
+        return;
+    }
+
+    while(tempEvidence != NULL) {
         if(tempEvidence->data->evidenceCategory == currentHunter->evidence) {
             //   remove it from the evidence collection
             removeEvidenceFromRoom(currentHunter->room->evidenceList, tempEvidence);
             addEvidenceToHunter(currentHunter->personalEvidence, tempEvidence);
+
+            //Reset the hunter boredom timer if evidence detected is ghostly
+            if(isGhostly(tempEvidence->data)) {
+                currentHunter->timer = BOREDOM_MAX;
+            }
         }
     }
+    return;
 }
+
+int generateStandardValue(EvidenceClassType evidenceClass){
+    switch(evidenceClass) { 
+        case 0:
+            return randFloat(0, 4.90);
+            break;
+        case 1:
+            return randFloat(0, 27.00);
+            break;
+        case 2:
+            return 0;
+            break;
+        case 3:
+            return randFloat(40.0, 70.0);
+            break;
+    }
+    return C_MISC_ERROR;
+}
+
+
 
 /*
     Removes evidence from a room
 */
 void removeEvidenceFromRoom(GhostEvidenceListType *list, EvidenceNodeType *evidence) {
     EvidenceNodeType *tempEvidence = list->head;
-    while(tempEvidence->next != evidence && tempEvidence != NULL) {
+    while(tempEvidence->next != NULL) {
+        if(tempEvidence->next == evidence){
+            //Prob need to free unless hunter uses it
+            tempEvidence->next = tempEvidence->next->next;
+        }
         tempEvidence = tempEvidence->next;
     }
 
-    // ALSO ACCOUNT FOR CASES WHEN NODE TO DELETE IS THE HEAD AND WHEN IT'S THE TAIL
-    if(tempEvidence != evidence) {
-        printf("Evidence not found whilst attempting to remove.\n");
-    } else {
-        //Probably free later
-        //free(tempEvidence->next);
-        tempEvidence->next = tempEvidence->next->next;
-    }
+    // // ALSO ACCOUNT FOR CASES WHEN NODE TO DELETE IS THE HEAD AND WHEN IT'S THE TAIL
+    // if(tempEvidence != evidence) {
+    //     //Return some error code
+    //     printf("Evidence not found whilst attempting to remove.\n");
+    // } else {
+    //     //Probably free later
+    //     //free(tempEvidence->next);
+    // }
 
 }
 
@@ -241,4 +324,34 @@ void addEvidenceToHunter(GhostEvidenceListType *list, EvidenceNodeType *evidence
     list->tail->next = NULL;
   }
   return;
+}
+
+
+/*
+    Returns a bool to determine is evidence ghostly.
+*/
+int isGhostly(EvidenceType *evidence){
+    switch(evidence->evidenceCategory) {
+        case 0:
+            if(evidence->readingData >= 4.70 && evidence->readingData <= 5.00){
+                return C_TRUE;
+            }
+            break;
+        case 1:
+            if(evidence->readingData >=-10 && evidence->readingData <=1){
+                return C_TRUE;
+            }
+            break;
+        case 2:
+            if(evidence->readingData == 1.00) { // This might give issues since it's comparing floats
+                return C_TRUE;
+            }
+            break;
+        case 3:
+            if(evidence->readingData >= 65.00 && evidence->readingData <= 75.00) {
+                return C_TRUE;
+            }
+            break;
+    }
+    return C_FALSE;
 }

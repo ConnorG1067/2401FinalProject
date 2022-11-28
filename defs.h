@@ -82,7 +82,7 @@ typedef struct HunterListType{
 
 typedef struct EvidenceType {
   EvidenceClassType evidenceCategory;
-  int readingData;
+  float readingData;
 } EvidenceType;
 
 typedef struct {
@@ -104,7 +104,7 @@ void initRoomList(RoomListType**);
 void initGhostList(GhostEvidenceListType *);
 void initGhost(GhostClassType *, RoomType*, GhostType *);
 void initPersonalEvidence(GhostEvidenceListType* );
-void initHunter(char* , RoomType *, HunterType *);
+void initHunter(char* , RoomType *, HunterType **);
 
 
 // THREADS
@@ -117,7 +117,6 @@ void appendRoom(RoomListType*, RoomNodeType*);
 int addHunterToList(HunterListType*, HunterType*);
 int addHunterToRoom(RoomType*, HunterType*);
 RoomNodeType* getRandomRoom(RoomNodeType*);
-
 GhostClassType getRandomGhostType();
 
 // GHOST THREAD HELPERS
@@ -135,3 +134,5 @@ void collectEvidence(HunterType*);
 int moveHunter(HunterType*);
 void addEvidenceToHunter(GhostEvidenceListType*, EvidenceNodeType*);
 void removeEvidenceFromRoom(GhostEvidenceListType *, EvidenceNodeType *);
+int isGhostly(EvidenceType*);
+int generateStandardValue(EvidenceClassType);
