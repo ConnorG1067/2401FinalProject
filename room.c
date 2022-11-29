@@ -2,6 +2,9 @@
 
 
 void initRoom(RoomType *room, char *name) {
+    sem_init(&room->mutex, 0, 1);
+    // Malloc some data probably
+
     //Name
     strcpy(room->name, name);
 
@@ -48,9 +51,13 @@ void appendRoom(RoomListType *roomList, RoomNodeType *room) {
     if(roomList->head == NULL) {
         roomList->head = room;
         roomList->tail = room;
+    } else if(roomList->head == roomList->tail){
+        roomList->tail = room;
+        roomList->head->next = roomList->tail;
     } else {
         roomList->tail->next = room;
         roomList->tail = room;
+        roomList->tail->next = NULL;
     }
 
     return;

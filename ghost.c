@@ -30,18 +30,19 @@ RoomNodeType* getRandomRoom(RoomNodeType *head){
 
 void *ghostThread(void *arg) {
     BuildingType *gThreadBuilding = (BuildingType*) arg;
-
+    
     GhostType *ghostPtr = (GhostType*) malloc(sizeof(GhostType));
     initGhost(POLTERGEIST, getRandomRoom(gThreadBuilding->rooms->head)->data, ghostPtr);
 
     // printf("Room Name: %s", ghostPtr->room->name);
     
-    //If the ghost is the room with a hunter reset bordin timer to boredom_max and it cannot move
+    //If the     is the room with a hunter reset bordin timer to boredom_max and it cannot move
     while(ghostPtr->boredomTimer > 0) {
+        //printf("Boredom timer: %d", ghostPtr->boredomTimer);
         //Ghost is in a room with a hunter
         if(checkGhostInRoom(ghostPtr)){
             int pickAction = randInt(0,2);
-            printf("In Room: %d\n", ghostPtr->boredomTimer);
+            //printf("In Room: %d\n", ghostPtr->boredomTimer);
             ghostPtr->boredomTimer = BOREDOM_MAX;
             if(pickAction) {
                 addRandomEvidence(ghostPtr);
@@ -49,7 +50,7 @@ void *ghostThread(void *arg) {
         //Ghost is not in a room with a hunter
         }else{
             int pickAction2 = randInt(0,3);
-            printf("NOT In Room: %d\n", ghostPtr->boredomTimer);
+            //printf("NOT In Room: %d\n", ghostPtr->boredomTimer);
             //Decrease bordom
             ghostPtr->boredomTimer--;
             //Pick an action
@@ -72,6 +73,8 @@ void *ghostThread(void *arg) {
             }
         }
     }
+    //printf("Done\n");
+    return NULL;
 }
 
 /*
@@ -159,9 +162,9 @@ int randomAdjacentRoom(GhostType *currentGhost){
     
     //Check if there is no room associated with the ghost
     if(currentGhost->room == NULL){
-        return C_NO_ROOM_ERROR;
+        return C_MISC_ERROR;
     }
-    
+
     //Loop through the linkedlist incrementing the sizeCounter
     while(tempRoomNode != NULL){
         tempRoomNode = tempRoomNode->next;

@@ -1,19 +1,17 @@
 #include "defs.h"
 
+
 int main(int argc, char *argv[])
 {
+
+    int 😂 = 5;
+    printf("%d", 😂);
 
     // Initialize a random seed for the random number generators
     srand(time(NULL));
 
     //Ghost thread
     pthread_t ghost;
-
-    
-
-
-
-   
 
     // You may change this code; this is for demonstration purposes
     BuildingType building;
@@ -27,6 +25,20 @@ int main(int argc, char *argv[])
     initHunterList(hunterListPtr);
 
     RoomType* vanRoom = building.rooms->head->data;
+    
+
+    //TEST CODE
+    // RoomNodeType *headNode = building.rooms->head;
+    // while(headNode != NULL){
+    //     printf("%s\n", headNode->data->name);
+    //     RoomNodeType *connectedRoomNode = headNode->data->connectedRooms->head;
+    //     while(connectedRoomNode != NULL){
+    //         printf("\t\tConnected: %s\n", connectedRoomNode->data->name);
+    //         connectedRoomNode = connectedRoomNode->next;
+
+    //     }
+    //     headNode = headNode->next;
+    // }
 
     // GhostType currentGhost;
     // GhostType *ghostPtr = &currentGhost;
@@ -38,41 +50,67 @@ int main(int argc, char *argv[])
     for(int i = 0; i < MAX_HUNTERS; i++) {
         printf("Hunter #%d: ", i+1);
         char name[MAX_STR];
-        scanf("%s", name);
+        scanf(" %s", name);
         
-        HunterType *currentHunterPtr = (HunterType*) malloc(sizeof(HunterType));
+
+        HunterType *currentHunterPtr;
+        
         initHunter(name, vanRoom, &currentHunterPtr);
         addHunterToList(hunterListPtr, currentHunterPtr);
         addHunterToRoom(vanRoom, currentHunterPtr);
     }
 
-    //Populate a hunter thread array
-    pthread_t hunterThreadArray[hunterListPtr->size];
-    for(int i = 0; i<hunterListPtr->size; i++){
-        pthread_t currentThread;
-        hunterThreadArray[i] = currentThread;
+    // //Populate a hunter thread array
+    // pthread_t hunterThreadArray[MAX_HUNTERS];
+    // for(int i = 0; i<MAX_HUNTERS; i++){
+    //     pthread_t currentThread;
+    //     hunterThreadArray[i] = currentThread;
 
-    }
+    // }
 
-    //pthread_create(&ghost, NULL, ghostThread, (void*) &building);
+    pthread_create(&ghost, NULL, ghostThread, (void*) &building);
 
     //Create them
-    for(int i = 0; i<hunterListPtr->size; i++) {
-        pthread_create(&hunterThreadArray[i], NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
-    }
+    pthread_t hunterThread1;
+    pthread_t hunterThread2;
+    pthread_t hunterThread3;
+    pthread_t hunterThread4;
 
-    
+    //for(int i = 0; i<MAX_HUNTERS; i++) {
+    pthread_create(&hunterThread1, NULL, hunterThread, (void*) hunterListPtr->hunterList[0]);
+    //pthread_create(&hunterThread2, NULL, hunterThread, (void*) hunterListPtr->hunterList[1]);
+
+    // //pthread_create(&hunterThread3, NULL, hunterThread, (void*) hunterListPtr->hunterList[2]);
+
+    // //pthread_create(&hunterThread4, NULL, hunterThread, (void*) hunterListPtr->hunterList[3]);
+
+    // //pthread_create(&hunterThread1, NULL, hunterThread, (void*) hunterListPtr->hunterList);
+
+    // //}
+
     // Join ghost thread
     //pthread_join(ghost, NULL);
 
+    //printf("JOINING GHOSTS\n");
+
     // Join hunter threads
-    for(int i = 0; i<hunterListPtr->size; i++) {
-        pthread_join(hunterThreadArray[i], NULL);
-    }
+    // for(int i = 0; i<MAX_HUNTERS; i++) {
+    printf("JOINING HUNTERS\n");
+    pthread_join(hunterThread1, NULL);
+    //pthread_join(hunterThread2, NULL);
+    // //pthread_join(hunterThread3, NULL);
+    // //pthread_join(hunterThread4, NULL);
+
+    // // }
+
+    
 
 
 
-    //pthread_exit(NULL);
+    
+
+
+    pthread_exit(NULL);
 
 
 

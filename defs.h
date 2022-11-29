@@ -30,7 +30,6 @@ typedef enum { POLTERGEIST, BANSHEE, BULLIES, PHANTOM } GhostClassType;
 int randInt(int, int);          // Generates a pseudorandom integer between the parameters
 float randFloat(float, float);  // Generates a pseudorandom float between the parameters
 
-
 typedef struct EvidenceNode{
     struct EvidenceType* data;
     struct EvidenceNode* next;
@@ -67,6 +66,7 @@ typedef struct GhostType{
 } GhostType;
 
 typedef struct RoomType{
+    sem_t mutex;
     char name[MAX_STR];
     RoomListType* connectedRooms;
     GhostEvidenceListType* evidenceList;
@@ -91,7 +91,6 @@ typedef struct {
     int hunterListSize;
     RoomListType* rooms;
 } BuildingType;
-
 
 // PROVIDED FUNTIONS
 void populateRooms(BuildingType*);
