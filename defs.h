@@ -60,7 +60,7 @@ typedef struct HunterType {
 } HunterType;
 
 typedef struct GhostType{
-  GhostClassType *ghostType;
+  GhostClassType ghostType;
   struct RoomType *room;
   int boredomTimer; // initialize to BOREDOM_MAX
 } GhostType;
@@ -101,7 +101,7 @@ void initBuilding(BuildingType*);
 void initRoom(RoomType*, char*);
 void initRoomList(RoomListType**);
 void initGhostList(GhostEvidenceListType *);
-void initGhost(GhostClassType *, RoomType*, GhostType *);
+void initGhost(GhostClassType, RoomType*, GhostType *);
 void initPersonalEvidence(GhostEvidenceListType* );
 void initHunter(char* , RoomType *, HunterType **);
 
@@ -121,8 +121,7 @@ GhostClassType getRandomGhostType();
 // GHOST THREAD HELPERS
 void addRandomEvidence(GhostType*);
 int generateValueOnType(EvidenceClassType);
-void moveGhost(GhostType*, int);
-int randomAdjacentRoom(GhostType*);
+void moveGhost(GhostType*);
 int checkGhostInRoom(GhostType*);
 
 // HUNTER THREAD HELPERS
@@ -135,3 +134,18 @@ void addEvidenceToHunter(GhostEvidenceListType*, EvidenceNodeType*);
 void removeEvidenceFromRoom(GhostEvidenceListType *, EvidenceNodeType *);
 int isGhostly(EvidenceType*);
 int generateStandardValue(EvidenceClassType);
+char* evidenceTypeToString(EvidenceClassType); 
+char* ghostTypeToString(GhostClassType ghost);
+
+// PRINT STATEMENTS
+void printHunter(HunterType*);
+void printGhost(GhostType*);
+void printGhostEvidenceList(GhostEvidenceListType*);
+void printEvidence(EvidenceType*);
+void printRoom(RoomType*);
+void printRoomList(RoomListType*);
+void printHunterList(HunterListType*);
+
+
+void printBuilding(BuildingType*);
+

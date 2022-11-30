@@ -12,6 +12,7 @@ void initRoom(RoomType *room, char *name) {
     //Lists
     room->connectedRooms = (RoomListType*) malloc(sizeof(RoomListType));
     initRoomList(&room->connectedRooms);
+
     room->evidenceList = (GhostEvidenceListType*) malloc(sizeof(GhostEvidenceListType));
     initGhostList(room->evidenceList);
 
@@ -20,12 +21,13 @@ void initRoom(RoomType *room, char *name) {
     room->hunters = hunterList;
 
     //Hunters and ghost
-    room->ghost = (GhostType*) malloc(sizeof(GhostType));
+    room->ghost = NULL;
 }
 
 void initRoomList(RoomListType **roomList){
     (*roomList)->head = NULL;
     (*roomList)->tail = NULL;
+    // printf("TESTING: %s\n", (*roomList)->head->data->name);
 }
 
 //Connected the two rooms together
@@ -48,17 +50,18 @@ void connectRooms(RoomType *room1, RoomType *room2){
 // Append a room to the end of a room list
 void appendRoom(RoomListType *roomList, RoomNodeType *room) {
 
-    if(roomList->head == NULL) {
-        roomList->head = room;
-        roomList->tail = room;
-    } else if(roomList->head == roomList->tail){
-        roomList->tail = room;
-        roomList->head->next = roomList->tail;
-    } else {
-        roomList->tail->next = room;
-        roomList->tail = room;
-        roomList->tail->next = NULL;
-    }
+    //Setting the values of new node
+	room->next = NULL;
+	
+	//Setting the end of the list to the new node
+	if(roomList->head == NULL){
+		roomList->head = room;
+		roomList->tail = room;
+	}else{
+		roomList->tail->next = room;
+		roomList->tail = room;
+
+	}
 
     return;
 }
@@ -66,8 +69,33 @@ void appendRoom(RoomListType *roomList, RoomNodeType *room) {
 int addHunterToRoom(RoomType* room, HunterType* hunter) {
     if(room->hunters->size<MAX_HUNTERS){
         room->hunters->hunterList[room->hunters->size++] = hunter;
+        hunter->room = room;
         return C_TRUE;
     }else{
         return C_FALSE;
+    }
+}
+
+void printRoom(RoomType *room) {
+    printf("\nRoom\n");
+    printf("Name: %s\n", room->name);
+    printf("Connected Rooms:\n");
+    printRoomList(room->connectedRooms);
+    printf("Ghost Evidence List:\n");
+    printGhostEvidenceList(room->evidenceList);
+    (room->hunters->size==0) ? printf("Hunters: Empty\n") : printHunterList(room->hunters);
+    printf("Ghost: ");
+    room->ghost == NULL ? printf("None\n") : printGhost(room->ghost);
+}
+
+
+void printRoomList(RoomListType *roomList) {
+    RoomNodeType *tempRoomNode = roomList->head;
+
+    
+
+    while(tempRoomNode != NULL){
+        printf("\t%s\n", tempRoomNode->data->name);
+        tempRoomNode = tempRoomNode->next;
     }
 }
