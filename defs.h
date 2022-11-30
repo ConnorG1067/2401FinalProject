@@ -136,7 +136,8 @@ int isGhostly(EvidenceType*);
 int generateStandardValue(EvidenceClassType);
 char* evidenceTypeToString(EvidenceClassType); 
 char* ghostTypeToString(GhostClassType ghost);
-
+GhostEvidenceListType* makeACopyOfPersonalEvidence(GhostEvidenceListType *);
+int checkIfDuplicate(GhostEvidenceListType *, EvidenceNodeType*);
 // PRINT STATEMENTS
 void printHunter(HunterType*);
 void printGhost(GhostType*);

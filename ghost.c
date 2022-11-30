@@ -37,20 +37,17 @@ void *ghostThread(void *arg) {
     
     //If the     is the room with a hunter reset bordin timer to boredom_max and it cannot move
     while(ghostPtr->boredomTimer > 0) {
+        printf("Ghost Boredom Timer: %d\n", ghostPtr->boredomTimer);
         //Ghost is in a room with a hunter
-        if(checkGhostInRoom(ghostPtr)){
-            // printf("Ghost room: %s", ghostPtr->room->name);
-            // for(int i = 0; i<ghostPtr->room->hunters->size; i++){
-            //     printf("Room: %s\n", ghostPtr->room->hunters->hunterList[i]->room->name);
-            // }
-            int pickAction = randInt(0,2);
-            ghostPtr->boredomTimer = BOREDOM_MAX;
-            if(pickAction) {
-                printf("GHOST ADDED EVIDENCE & IN SAME ROOM\n");
-                addRandomEvidence(ghostPtr);
-            }
+        // if(checkGhostInRoom(ghostPtr)){
+        //     int pickAction = randInt(0,2);
+        //     ghostPtr->boredomTimer = BOREDOM_MAX;
+        //     if(pickAction) {
+        //         printf("GHOST ADDED EVIDENCE & IN SAME ROOM\n");
+        //         addRandomEvidence(ghostPtr);
+        //     }
         //Ghost is not in a room with a hunter
-        }else{
+        // }else{
             int pickAction2 = randInt(0,3);
             //Decrease bordom
             ghostPtr->boredomTimer--;
@@ -59,17 +56,18 @@ void *ghostThread(void *arg) {
                 //Move to another room
                 case 0:
                     //Make similar to hunters
+                    printf("\n\nMOVING GHOST\n");
                     moveGhost(ghostPtr);
-                    
                     break;
                 // leave evidence
                 case 1: 
+                    printf("\n\nAdding Evidence\n");
                     addRandomEvidence(ghostPtr);
                     break;
                 // Do Nothing
                 case 2:
                     break;
-            }
+            // }
         }
     }
     return NULL;
@@ -82,8 +80,7 @@ void addRandomEvidence(GhostType *currentGhost) {
     //Generate new evidence
     EvidenceNodeType *evidenceNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
     
-    EvidenceType newEvidence;
-    EvidenceType *newEvidencePtr = &newEvidence;
+    EvidenceType *newEvidencePtr = (EvidenceType*) malloc(sizeof(EvidenceType));
     int randomEvidence = randInt(0, 4);
     newEvidencePtr->evidenceCategory = (EvidenceClassType) randomEvidence;
     //Probably change later, def shouldnt be this
@@ -92,18 +89,30 @@ void addRandomEvidence(GhostType *currentGhost) {
     evidenceNode->data = newEvidencePtr;
     evidenceNode->next = NULL;
     
-    //Set the evidenceList to new evidence
-    if(currentGhost->room->evidenceList->head == NULL){
-        currentGhost->room->evidenceList->head = evidenceNode;
-        currentGhost->room->evidenceList->tail = evidenceNode;
-    }else if (currentGhost->room->evidenceList->head == currentGhost->room->evidenceList->tail){
-        currentGhost->room->evidenceList->head->next = evidenceNode;
-        currentGhost->room->evidenceList->tail = evidenceNode;
-    }else{
-        currentGhost->room->evidenceList->tail->next = evidenceNode;
-        currentGhost->room->evidenceList->tail = evidenceNode;
-    }
+    printf("WHAT WE WANNA ADD\n");
+    printf("Name: %s\n", evidenceTypeToString(evidenceNode->data->evidenceCategory));
+    printf("Reading: %f\n", evidenceNode->data->readingData);
 
+
+	
+	//Setting the end of the list to the new node
+
+    
+	if(currentGhost->room->evidenceList->head == NULL){
+		currentGhost->room->evidenceList->head = evidenceNode;
+		currentGhost->room->evidenceList->tail = evidenceNode;
+	}else{
+		currentGhost->room->evidenceList->tail->next = evidenceNode;
+		currentGhost->room->evidenceList->tail = evidenceNode;
+    }
+    
+    printf("PRINTING THE ENTIRE EVIDENCE LIST\n");
+    EvidenceNodeType *evNodeTemp = currentGhost->room->evidenceList->head;
+    while(evNodeTemp != NULL){
+        printf("Name: %s\n", evidenceTypeToString(evNodeTemp->data->evidenceCategory));
+        printf("Reading: %f\n", evNodeTemp->data->readingData);
+        evNodeTemp = evNodeTemp->next;
+    }
     
     return;
 }
@@ -135,7 +144,6 @@ int generateValueOnType(EvidenceClassType evidenceType){
     Utilizes the randomAdjacentRoom function to decide on a value to move to
 */
 void moveGhost(GhostType *currentGhost){
-    printf("\n\nMOVING GHOST\n");
 
     printf("CURRENT: ghost current room %s\n", currentGhost->room->name);
 
@@ -156,6 +164,7 @@ void moveGhost(GhostType *currentGhost){
 
 
     //Sets previous room's ghost to NULL
+    
     currentGhost->room->ghost = NULL;
     //Updates ghosts room
     currentGhost->room = tempRoom->data;

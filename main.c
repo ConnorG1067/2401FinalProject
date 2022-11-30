@@ -74,12 +74,8 @@ int main(int argc, char *argv[])
     pthread_create(&ghost, NULL, ghostThread, (void*) &building);
 
 
-    pthread_join(ghost, NULL);
-
-
     for(int i = 0; i<MAX_HUNTERS; i++) {
         pthread_create(hunterThreadArray + i, NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
-        pthread_join(hunterThreadArray[i], NULL);
     }
 
     // Join ghost thread
@@ -87,11 +83,11 @@ int main(int argc, char *argv[])
 
     // Join hunter threads
 
-    // for(int i = 0; i<MAX_HUNTERS; i++) {
-    //     pthread_join(hunterThreadArray[i], NULL);
-    // }
+    for(int i = 0; i<MAX_HUNTERS; i++) {
+        pthread_join(hunterThreadArray[i], NULL);
+    }
 
-    
+    pthread_join(ghost, NULL);
 
 
 
