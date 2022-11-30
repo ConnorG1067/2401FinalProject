@@ -56,10 +56,6 @@ int main(int argc, char *argv[])
         //BREAKS!
         addHunterToList(hunterListPtr, currentHunterPtr);
         addHunterToRoom(vanRoom, currentHunterPtr);
-
-        printf("\n");
-        printHunter(hunterListPtr->hunterList[i]);
-        printf("\n");
     }
 
 
@@ -78,22 +74,12 @@ int main(int argc, char *argv[])
         pthread_create(hunterThreadArray + i, NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
     }
 
-    // Join ghost thread
-
-
-    // Join hunter threads
 
     for(int i = 0; i<MAX_HUNTERS; i++) {
         pthread_join(hunterThreadArray[i], NULL);
     }
 
     pthread_join(ghost, NULL);
-
-
-
-    
-
-
     pthread_exit(NULL);
 
 

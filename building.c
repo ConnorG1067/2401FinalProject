@@ -106,6 +106,10 @@ void populateRooms(BuildingType* building) {
     connectRooms(garage, utility_room);
 }
 
+/* *******************************************************************************************
+ * initBuilding, Initalizes the building
+ * BuildingType *building (out), the building to initalize
+ ********************************************************************************************/
 void initBuilding(BuildingType *building){
     building->ghost = (GhostType*) malloc(sizeof(GhostType));
     building->rooms = (RoomListType*) malloc(sizeof(RoomListType));

@@ -138,6 +138,8 @@ char* evidenceTypeToString(EvidenceClassType);
 char* ghostTypeToString(GhostClassType ghost);
 GhostEvidenceListType* makeACopyOfPersonalEvidence(GhostEvidenceListType *);
 int checkIfDuplicate(GhostEvidenceListType *, EvidenceNodeType*);
+void addEvidenceToRoom(GhostEvidenceListType *, EvidenceNodeType*);
+
 // PRINT STATEMENTS
 void printHunter(HunterType*);
 void printGhost(GhostType*);
