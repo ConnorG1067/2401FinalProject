@@ -64,7 +64,6 @@ void *ghostThread(void *arg) {
 
             // If the action is not 0, so 1, add some random evidence
             if(pickAction) {
-                printf("GHOST ADDED EVIDENCE & IN SAME ROOM\n");
                 addRandomEvidence(ghostPtr);
             }
         // If the ghost does not exist in the same room
@@ -125,13 +124,13 @@ void addRandomEvidence(GhostType *currentGhost) {
 	addEvidenceToRoom(currentGhost->room->evidenceList, evidenceNode);
     
     // PRINTING BULLSHIT
-    printf("PRINTING THE ENTIRE EVIDENCE LIST\n");
-    EvidenceNodeType *evNodeTemp = currentGhost->room->evidenceList->head;
-    while(evNodeTemp != NULL){
-        printf("Name: %s\n", evidenceTypeToString(evNodeTemp->data->evidenceCategory));
-        printf("Reading: %f\n", evNodeTemp->data->readingData);
-        evNodeTemp = evNodeTemp->next;
-    }
+    // printf("PRINTING THE ENTIRE EVIDENCE LIST\n");
+    // EvidenceNodeType *evNodeTemp = currentGhost->room->evidenceList->head;
+    // while(evNodeTemp != NULL){
+    //     printf("NameYOHERE: %s\n", evidenceTypeToString(evNodeTemp->data->evidenceCategory));
+    //     printf("ReadingYOHJERE: %f\n", evNodeTemp->data->readingData);
+    //     evNodeTemp = evNodeTemp->next;
+    // }
 }
 
 /* *******************************************************************************************
@@ -215,6 +214,7 @@ void moveGhost(GhostType *currentGhost){
  ********************************************************************************************/
 int checkGhostInRoom(GhostType *currentGhost){
     // If the size of the hunters in the given room, in which the ghost resides, is greater than 0, return C_TRUE
+    printf("Size of hunters in ghost room %d\n", currentGhost->room->hunters->size);
     return (currentGhost->room->hunters->size > 0) ? C_TRUE : C_FALSE;
 }
 

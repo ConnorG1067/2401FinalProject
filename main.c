@@ -68,18 +68,22 @@ int main(int argc, char *argv[])
     }
 
     pthread_create(&ghost, NULL, ghostThread, (void*) &building);
-
+// pthread_create(hunterThreadArray, NULL, hunterThread, (void*) hunterListPtr->hunterList[0]);
 
     for(int i = 0; i<MAX_HUNTERS; i++) {
         pthread_create(hunterThreadArray + i, NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
+        // pthread_join(hunterThreadArray[i], NULL);
     }
 
+    pthread_join(hunterThreadArray[0], NULL);
 
     for(int i = 0; i<MAX_HUNTERS; i++) {
         pthread_join(hunterThreadArray[i], NULL);
     }
 
     pthread_join(ghost, NULL);
+   
+
     pthread_exit(NULL);
 
 

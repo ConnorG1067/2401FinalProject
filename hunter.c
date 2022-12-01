@@ -114,8 +114,35 @@ void *hunterThread(void *arg) {
                 break;
         }
     }
+    printf("EXITING HUNTER THREAD\n");
+    removeHunterFromRoom(hThreadHunter);
+
     return NULL;
 }   
+
+void removeHunterFromRoom(HunterType *hunter){
+    HunterListType *huntersInRoom = hunter->room->hunters;
+    printf("REMOVING HUNTER\nLIST BEFORE\n");
+    printf("Size of room hunter list %d\n", huntersInRoom->size);
+    for(int i = 0; i<huntersInRoom->size; i++){
+        printf("   Name: %s\n", huntersInRoom->hunterList[i]->name);
+    }
+
+    for(int i = 0; i<huntersInRoom->size; i++){
+        if(huntersInRoom->hunterList[i] == hunter){
+            for(int j = i + 1; j<huntersInRoom->size; j++){
+                huntersInRoom->hunterList[j-1] = huntersInRoom->hunterList[j];
+            }
+        }
+    }
+    huntersInRoom->size--;
+    printf("LIST AFTER\n");
+    for(int i = 0; i<huntersInRoom->size; i++){
+        printf("   Name: %s\n", huntersInRoom->hunterList[i]->name);
+    }
+
+}
+
 
 /* *******************************************************************************************
  * checkHunterWithGhost, if the hunter & ghost are in the same room return C_TRUE
@@ -387,7 +414,6 @@ void collectEvidence(HunterType *currentHunter) {
 
             //PRINTING BULLSHIT
             printf("DETECTED EV: added evidence: %s\n", evidenceTypeToString(currentHunter->personalEvidence->tail->data->evidenceCategory));
-            printf("REMOVE: Room's Evidence List\n");
 
             //PRINTING BULLSHIT
             printf("NEW: Room's Evidence List\n");

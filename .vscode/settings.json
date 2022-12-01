@@ -2,5 +2,6 @@
     "files.associations": {
         "typeinfo": "c"
     },
-    "liveServer.settings.multiRootWorkspaceName": "SHAREDFOLDA"
+    "liveServer.settings.multiRootWorkspaceName": "SHAREDFOLDA",
+    "C_Cpp.errorSquiggles": "Disabled"
 }
