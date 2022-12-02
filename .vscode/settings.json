@@ -1,6 +1,8 @@
 {
     "files.associations": {
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "cmath": "c",
+        "defs.h": "c"
     },
     "liveServer.settings.multiRootWorkspaceName": "SHAREDFOLDA",
     "C_Cpp.errorSquiggles": "Disabled"

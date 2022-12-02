@@ -7,7 +7,7 @@
  ********************************************************************************************/
 void initRoom(RoomType *room, char *name) {
     // Initalize the mutex
-    sem_init(&room->mutex, 0, 1);
+    sem_init(&(room->mutex), 0, 1);
 
     // Copy the name
     strcpy(room->name, name);
@@ -110,7 +110,7 @@ void printRoom(RoomType *room) {
     printf("Connected Rooms:\n");
     printRoomList(room->connectedRooms);
     printf("Ghost Evidence List:\n");
-    printGhostEvidenceList(room->evidenceList);
+    // printGhostEvidenceList(room->evidenceList);
     (room->hunters->size==0) ? printf("Hunters: Empty\n") : printHunterList(room->hunters);
     printf("Ghost: ");
     room->ghost == NULL ? printf("None\n") : printGhost(room->ghost);

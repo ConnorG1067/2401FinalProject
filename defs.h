@@ -1,8 +1,8 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -116,7 +116,6 @@ void appendRoom(RoomListType*, RoomNodeType*);
 int addHunterToList(HunterListType*, HunterType*);
 int addHunterToRoom(RoomType*, HunterType*);
 RoomNodeType* getRandomRoom(RoomNodeType*);
-GhostClassType getRandomGhostType();
 
 // GHOST THREAD HELPERS
 void addRandomEvidence(GhostType*);
@@ -144,7 +143,7 @@ void removeHunterFromRoom(HunterType *);
 // PRINT STATEMENTS
 void printHunter(HunterType*);
 void printGhost(GhostType*);
-void printGhostEvidenceList(GhostEvidenceListType*);
+void printGhostEvidenceList(GhostEvidenceListType*, char*);
 void printEvidence(EvidenceType*);
 void printRoom(RoomType*);
 void printRoomList(RoomListType*);

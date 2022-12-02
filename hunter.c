@@ -75,13 +75,15 @@ int addHunterToList(HunterListType* hunters, HunterType* hunter){
 void *hunterThread(void *arg) {
     // Set a local hunter pointer which points to the argument
     HunterType *hThreadHunter = (HunterType*) arg;
-
+    
     // Exit if there are three different pieces of evidence
     //  OR fear level is greater than or equal to 100
     //  OR if boredom timer is <= 0
     // Exit the while loop, thus exiting the thread.
+    // sem_wait(&(hThreadHunter->room->mutex));
+    int g;
     while(!(containsThreeEvidence(hThreadHunter) || (hThreadHunter->fear >= 100) || (hThreadHunter->timer <= 0))) {
-        
+        // printf("Main hunter thread while\n");
         // Check if the hThreadHunter and the ghost exist in the same room
         if(checkHunterWithGhost(hThreadHunter)) {
             // If they do increase the fear & reset the boredom timer
@@ -91,10 +93,13 @@ void *hunterThread(void *arg) {
 
         // Pick a random integer between 0-2 (inclusive)
         int hunterChoice = randInt(0,3);
-        printf("Hunters Choice: %d\n", hunterChoice);
+        // printf("Hunters Choice: %d\n", hunterChoice);
+        sem_getvalue(&(hThreadHunter->room->mutex), &g);
+        // printf("Room %s with semaphore value: %d\n", hThreadHunter->room->name, g);
 
         switch(hunterChoice){
             case 0:
+                printf("COLLECTING EVIDNECE\n");
                 // Collect Evidence
                 sem_wait(&(hThreadHunter->room->mutex));
                 collectEvidence(hThreadHunter);
@@ -103,44 +108,73 @@ void *hunterThread(void *arg) {
             
             case 1:
                 // Move
+                printf("\n\nMOVE HUTNER: \n");
                 moveHunter(hThreadHunter);
-                
+                // printf("\n\n\nRELEASED MOVE\n\n\n");
                 break;
             case 2:
                 //Communicate
+                sem_wait(&(hThreadHunter->room->mutex));
+                // if(sem_trywait(&(hThreadHunter->room->mutex)) == 0)
                 if(hThreadHunter->room->hunters->size > 1){
+                    printf("COMMUNICATE ROOM:\n");
                     communicateEvidence(hThreadHunter);
                 }
+                sem_post(&(hThreadHunter->room->mutex));
+                // int valueOfSem;
+                // sem_getvalue(&(hThreadHunter->room->mutex), &valueOfSem);
+                // printf("\n\n\nRELEASED COMMUINICATE\n\n\n");
                 break;
         }
+
     }
-    printf("EXITING HUNTER THREAD\n");
+    // printf("Boredom Timer %d\n", hThreadHunter->timer);
+    // printf("Fear Timer %d\n", hThreadHunter->fear);
+    // printf("contains evidence: %s\n", containsThreeEvidence(hThreadHunter) ? "True" : "False");
+    printf("REMOVING HUNTER!!!!\n");
     removeHunterFromRoom(hThreadHunter);
+    // printf("ENDING HUNTER THREAD\n");
+    // sem_getvalue(&(hThreadHunter->room->mutex), &g);
+    // printf("Semaphore value ending %d\n", g);
+    // sem_destroy(&(hThreadHunter->room->mutex));
 
     return NULL;
 }   
 
 void removeHunterFromRoom(HunterType *hunter){
+    // int g;
+    RoomType* oldRoom = hunter->room;
+    // sem_getvalue(&(hunter->room->mutex), &g);
+    // printf("INSIDE REMOVE BEFORE WAIT: %d\n", g);
+    sem_wait(&(oldRoom->mutex));
+
+    // sem_getvalue(&(hunter->room->mutex), &g);
+    // printf("INSIDE REMOVE: %d\n", g);
     HunterListType *huntersInRoom = hunter->room->hunters;
-    printf("REMOVING HUNTER\nLIST BEFORE\n");
-    printf("Size of room hunter list %d\n", huntersInRoom->size);
-    for(int i = 0; i<huntersInRoom->size; i++){
-        printf("   Name: %s\n", huntersInRoom->hunterList[i]->name);
-    }
+
+    // printf("REMOVING HUNTER\nLIST BEFORE\n");
+    // printf("Size of room hunter list %d\n", huntersInRoom->size);
+    // for(int i = 0; i<huntersInRoom->size; i++){
+    //     printf("   Name: %s\n", huntersInRoom->hunterList[i]->name);
+    // }
 
     for(int i = 0; i<huntersInRoom->size; i++){
         if(huntersInRoom->hunterList[i] == hunter){
-            for(int j = i + 1; j<huntersInRoom->size; j++){
+            for(int j = i+1; j<huntersInRoom->size; j++){
                 huntersInRoom->hunterList[j-1] = huntersInRoom->hunterList[j];
             }
+
+            huntersInRoom->size--;
+            break;
         }
     }
-    huntersInRoom->size--;
-    printf("LIST AFTER\n");
-    for(int i = 0; i<huntersInRoom->size; i++){
-        printf("   Name: %s\n", huntersInRoom->hunterList[i]->name);
-    }
 
+    // printf("LIST AFTER\n");
+    // for(int i = 0; i<huntersInRoom->size; i++){
+    //     printf("   Name: %s\n", huntersInRoom->hunterList[i]->name);
+    // }
+
+    sem_post(&(oldRoom->mutex));
 }
 
 
@@ -151,7 +185,7 @@ void removeHunterFromRoom(HunterType *hunter){
 int checkHunterWithGhost(HunterType *currentHunter) { 
     // If the hunter's room's ghost is NOT null, return C_TRUE
     if(currentHunter->room->ghost != NULL) {
-        printf("%s is in a room with the ghost\n", currentHunter->name);
+        // printf("%s is in a room with the ghost\n", currentHunter->name);
         return C_TRUE;
     }
     // Otherwise return C_FALSE
@@ -169,6 +203,7 @@ int containsThreeEvidence(HunterType *currentHunter) {
 
     // Iterate over list, until you reach the end, keep track of how many elements there are
     while(tempEvidenceNode != NULL) {
+        // printf("contains 3 ev while \n");
         evidenceCounter++;
         tempEvidenceNode = tempEvidenceNode->next;
     }
@@ -184,7 +219,7 @@ int containsThreeEvidence(HunterType *currentHunter) {
  ********************************************************************************************/
 int communicateEvidence(HunterType *currentHunter) {
 
-    //PRINTING BULLSHIT
+    // // //PRINTING BULLSHIT
     printf("\n\nCommunicate Evidence\n");
     printf("Current Hunters Evidence To Start:\n");
     EvidenceNodeType *currEvHead = currentHunter->personalEvidence->head;
@@ -198,10 +233,12 @@ int communicateEvidence(HunterType *currentHunter) {
     
     // Select a random hunter from the list (0-3) inclusive
     int randomHunter = randInt(0, currentRoom->hunters->size);
-
+    
+    printf("Random Hunter pick while (For communicate) %d\n", currentHunter->room->hunters->size);
     // Re-run the random call until the random hunter does NOT equal the currentHunter
-    while(currentHunter == currentRoom->hunters->hunterList[randomHunter]){
+    while(currentHunter == currentRoom->hunters->hunterList[randomHunter]/* && currentRoom->hunters->size > 1*/){
         randomHunter = randInt(0, currentRoom->hunters->size);
+        printf("Random Hunter pick while (For communicate) %d\n", currentHunter->room->hunters->size);
     }
 
     // Make a variable name hunterToCommunicate for the random hunterSelected
@@ -210,6 +247,7 @@ int communicateEvidence(HunterType *currentHunter) {
     //PRINTING BULLSHIT
     printf("To Communicate hunter evidence To start:\n");
     EvidenceNodeType *toCommunicateEv = currentRoom->hunters->hunterList[randomHunter]->personalEvidence->head;
+    printf("Hunter %s is communicating with %s\n", currentHunter->name, currentRoom->hunters->hunterList[randomHunter]->name);
     while(toCommunicateEv != NULL){
         printf("  %s %f %s\n", evidenceTypeToString(toCommunicateEv->data->evidenceCategory), toCommunicateEv->data->readingData, (isGhostly(toCommunicateEv->data)) ? "IS GHOSTLY" : "");
         toCommunicateEv = toCommunicateEv->next;
@@ -225,6 +263,7 @@ int communicateEvidence(HunterType *currentHunter) {
     
     // Iterating through the hunterToCommunicate Evidence add each node evidence to the currentHunter personal evidence list if ghostly & is not already existing
     while(hunterTraverseNode != NULL) {
+        // printf("Sharing hunterToCommunicate to currentHunter (For communicate)\n");
         // Only add the node to the current hunter if the data is unique & it is ghostly
         if(isGhostly(hunterTraverseNode->data) && !checkIfDuplicate(currentHunter->personalEvidence, hunterTraverseNode)) {
 
@@ -245,10 +284,18 @@ int communicateEvidence(HunterType *currentHunter) {
  
     // Iterating through the currentHunter's COPIED LIST Evidence add each node evidence to the hunterToCommunicate personal evidence list if ghostly & is not already existing
     while(currentHunterTraverseNode != NULL){
+        // printf("Sharing currentHunter to hunterToCommunicate (For communicate)\n");
         // Only add the node to the hunterToCommunicate if the data is unique & it is ghostly
         if(isGhostly(currentHunterTraverseNode->data) && !checkIfDuplicate(hunterToCommunicate->personalEvidence, currentHunterTraverseNode)){
+            // Allocate memory for a new node
+            EvidenceNodeType *deepCopyEvNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
+            
+            // Set the data of the new node to the data of the traversing node
+            deepCopyEvNode->data = currentHunterTraverseNode->data;
+            deepCopyEvNode->next = NULL;
+             
             // Add the currentHunterTraverseNode to the hunterToCommunicate's personalEvidence list. No node creation is needed since we copied a brand new list already
-            addEvidenceToHunter(hunterToCommunicate->personalEvidence, currentHunterTraverseNode);
+            addEvidenceToHunter(hunterToCommunicate->personalEvidence, deepCopyEvNode);
         }
         // Allow for looping
         currentHunterTraverseNode = currentHunterTraverseNode->next;
@@ -281,15 +328,20 @@ int communicateEvidence(HunterType *currentHunter) {
  ********************************************************************************************/
 int moveHunter(HunterType* currentHunter){
     // PRINTING BULLSHIT
-    printf("\n\nMOVING\n");
-
+    
+    
     // Find the size of the room, so we can pick a random room
     RoomNodeType *traverseRoomNode = currentHunter->room->connectedRooms->head;
     int sizeCounter = 0;
     while(traverseRoomNode != NULL){
+        // printf("Move Hunter while\n");
         sizeCounter++;
         traverseRoomNode = traverseRoomNode->next;
     }
+
+    // printf("CURRENT ROOM: %s\n", currentHunter->room->name);
+    // printRoomList(currentHunter->room->connectedRooms);
+    // printf("\n\n");
     // Pick a random number between 0 and (sizeCounter-1) (inclusive)
     int randomRoomInt = randInt(0, sizeCounter);
 
@@ -298,14 +350,41 @@ int moveHunter(HunterType* currentHunter){
     for(int i = 0; i<randomRoomInt; i++){
         randomRoomNode = randomRoomNode->next;
     }
-    
-    //PRINTING BULLSHIT
-    printf("ORIGINAL: Hunters from %s\n", currentHunter->room->name);
-    for(int i = 0; i<currentHunter->room->hunters->size; i++){
-        printf("%s\n", currentHunter->room->hunters->hunterList[i]->name);
-    }
 
-    printf("Moved %s from %s to %s\n", currentHunter->name, currentHunter->room->name, randomRoomNode->data->name);
+    RoomType *oldRoom = currentHunter->room;
+    sem_wait(&(oldRoom->mutex));
+
+    if(sem_trywait(&(randomRoomNode->data->mutex)) != 0){
+        // printf("Waiting For Move Decision\n");
+        sem_post(&(oldRoom->mutex));
+        return C_FALSE;
+    }
+    
+
+
+    // int curVal;
+    // int newVal;
+    // sem_getvalue(&(oldRoomSemaphore), &curVal);
+    // sem_getvalue(&(randomRoomNode->data->mutex), &newVal);
+    // printf("Current Room + Sem (%s,%d)\t\tNEW Room + Sem (%s,%d)\n", currentHunter->room->name, curVal, randomRoomNode->data->name, newVal);
+
+    // if(sem_trywait(&(randomRoomNode->data->mutex)) != 0){
+    //     sem_post(&(oldRoomSemaphore));
+    //     // sem_getvalue(&(oldRoomSemaphore), &curVal);
+    //     // sem_getvalue(&(randomRoomNode->data->mutex), &newVal);
+    //     // printf("IN IF Current Room + Sem (%s,%d)\t\tNEW Room + Sem (%s,%d)\n", currentHunter->room->name, curVal, randomRoomNode->data->name, newVal);
+    //     // printf("\nDid not move hunter\n");
+    //     return C_FALSE;
+    // }
+    // printf("Did not return\n");
+
+    //PRINTING BULLSHIT
+    // printf("ORIGINAL: Hunters from %s\n", currentHunter->room->name);
+    // for(int i = 0; i<currentHunter->room->hunters->size; i++){
+    //     printf("%s\n", currentHunter->room->hunters->hunterList[i]->name);
+    // }
+
+    // printf("Moved %s from %s to %s\n", currentHunter->name, currentHunter->room->name, randomRoomNode->data->name);
 
 
     // Remove the current hunter from his previous room
@@ -313,37 +392,48 @@ int moveHunter(HunterType* currentHunter){
     for(int i = 0; i<size; i++){
         if(currentHunter->room->hunters->hunterList[i] == currentHunter){
             for(int j = i+1; j<size; j++){
+                // sem_wait(&(currentHunter->room->mutex));
                 currentHunter->room->hunters->hunterList[j-1] = currentHunter->room->hunters->hunterList[j];
+                // sem_post(&(currentHunter->room->mutex));
             }
+            // Decrease the size
+            currentHunter->room->hunters->size--;
             break;
         }
     }
     
-    // Decrease the size
-    currentHunter->room->hunters->size--;
+    
 
 
     //PRINTING BULLSHIT
-    printf("REMOVED: Hunters from %s\n", currentHunter->room->name);
-    for(int i = 0; i<currentHunter->room->hunters->size; i++){
-        printf("%s\n", currentHunter->room->hunters->hunterList[i]->name);
-    }
+    // printf("REMOVED: Hunters from %s\n", currentHunter->room->name);
+    // for(int i = 0; i<currentHunter->room->hunters->size; i++){
+    //     printf("%s\n", currentHunter->room->hunters->hunterList[i]->name);
+    // }
 
+    
 
-
-    //Add him to the new room
+    // sem_wait(&(currentHunter->room->mutex));
     addHunterToRoom(randomRoomNode->data, currentHunter);
-    // Decrease the boredom timer
+    // printf("added hunter: %s\n", addHunterToRoom(randomRoomNode->data, currentHunter) ? "True" : "False");
     currentHunter->timer--;
+  
+    // Decrease the boredom timer
 
     
     // PRINTING BULLSHIT
-    printf("NEW ROOM: Hunters from %s\n", randomRoomNode->data->name);
-    for(int i = 0; i<currentHunter->room->hunters->size; i++){
-        printf("%s\n", currentHunter->room->hunters->hunterList[i]->name);
-    }  
+    // printf("NEW ROOM: Hunters from %s\n", randomRoomNode->data->name);
+    // for(int i = 0; i<currentHunter->room->hunters->size; i++){
+    //     printf("%s\n", currentHunter->room->hunters->hunterList[i]->name);
+    // }  
 
-    printf("\n\n");
+    // printf("\n\n");
+    // printf("Old Room %s, New room %s\n", oldRoom->name, currentHunter->room->name);
+    // sem_post(&(randomRoomNode->data->mutex));
+    // sem_post(&(oldRoomSemaphore));
+    sem_post(&(oldRoom->mutex));
+    sem_post(&(randomRoomNode->data->mutex));
+    printf("%s Moved from %s to %s\n", currentHunter->room->name, oldRoom->name, randomRoomNode->data->name);
     return C_TRUE;
 }
 
@@ -353,15 +443,23 @@ int moveHunter(HunterType* currentHunter){
  ********************************************************************************************/
 void collectEvidence(HunterType *currentHunter) {
     // PRINTING BULLSHIT
-    printf("\n\nORIGINAL: Room's Evidence List\n");
+    printf("\n\nORIGINAL: Room's Evidence List FOR %s\n", currentHunter->name);
     EvidenceNodeType *newTempEvidence = currentHunter->room->evidenceList->head;
     while(newTempEvidence != NULL){
-        printf("Category: %s\n", evidenceTypeToString(newTempEvidence->data->evidenceCategory));
+        printf("Category: %s\n ", evidenceTypeToString(newTempEvidence->data->evidenceCategory));
         newTempEvidence = newTempEvidence->next;
     }
 
+    printf("Hunters evidence List BEFORE\n");
+            EvidenceNodeType *temptemptemp = currentHunter->personalEvidence->head;
+            while(temptemptemp != NULL){
+                printf("Type in while: %s %f\n", evidenceTypeToString(temptemptemp->data->evidenceCategory), temptemptemp->data->readingData);
+                temptemptemp = temptemptemp->next;
+            }
+
     // If the room contains NO evidence give him random standard evidence of his tool type
     if(currentHunter->room->evidenceList->head == NULL) {
+        
         // Allocate and create a new standard evidence
         EvidenceNodeType *newEvidence = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
         newEvidence->data = (EvidenceType*) malloc(sizeof(EvidenceType));
@@ -372,8 +470,13 @@ void collectEvidence(HunterType *currentHunter) {
         addEvidenceToHunter(currentHunter->personalEvidence, newEvidence);
 
         //PRINTING BULLSHIT
-        printf("STANDARD EV:(no ev) added evidence: %s\n", evidenceTypeToString(currentHunter->personalEvidence->tail->data->evidenceCategory));
-        
+        printf("STANDARD EV:(no ev) added evidence: %s %f\n", evidenceTypeToString(newEvidence->data->evidenceCategory), newEvidence->data->readingData);
+        printf("Hunters evidence List AFTER\n");
+            EvidenceNodeType *temptemp = currentHunter->personalEvidence->head;
+            while(temptemp != NULL){
+                printf("Type in while: %s %f\n", evidenceTypeToString(temptemp->data->evidenceCategory), temptemp->data->readingData);
+                temptemp = temptemp->next;
+            }
         // Exit the function
         return;
     }
@@ -381,6 +484,7 @@ void collectEvidence(HunterType *currentHunter) {
     // If the list is not empty, iterate through until either nothing is found or an evidence of the same type of the current hunters tool is found
     EvidenceNodeType *tempEvidence = currentHunter->room->evidenceList->head;
     while(tempEvidence != NULL) {
+        // printf("Collect evidence while\n");
         // If the currentHunters tool matches that of the type of the evidenceType
         if(tempEvidence->data->evidenceCategory == currentHunter->evidence) {
 
@@ -398,7 +502,7 @@ void collectEvidence(HunterType *currentHunter) {
             addEvidenceToHunter(currentHunter->personalEvidence, tempEvidence);
 
 
-            //PRINTING BULLSHIT
+            // PRINTING BULLSHIT
             printf("Hunters evidence List AFTER\n");
             EvidenceNodeType *temptemp = currentHunter->personalEvidence->head;
             while(temptemp != NULL){
@@ -409,7 +513,7 @@ void collectEvidence(HunterType *currentHunter) {
             // Reset the hunter boredom timer if evidence detected is ghostly
             if(isGhostly(tempEvidence->data)) {
                 currentHunter->timer = BOREDOM_MAX;
-                printf("IT IS GHOSTLY: %d\n", currentHunter->timer);
+                // printf("IT IS GHOSTLY: %d\n", currentHunter->timer);
             }
 
             //PRINTING BULLSHIT
@@ -419,16 +523,15 @@ void collectEvidence(HunterType *currentHunter) {
             printf("NEW: Room's Evidence List\n");
             EvidenceNodeType *newTempEvidence = currentHunter->room->evidenceList->head;
             while(newTempEvidence != NULL){
-                printf("Type in while: %s\n", evidenceTypeToString(newTempEvidence->data->evidenceCategory));
+                printf("  %s\n", evidenceTypeToString(newTempEvidence->data->evidenceCategory));
                 newTempEvidence = newTempEvidence->next;
             }
         }
         // Allow for looping
         tempEvidence = tempEvidence->next;
-
     }
     //PRINTING BULLSHIT
-    printf("\n\n\n");
+    // printf("\n\n\n");
 }
 
 
@@ -474,6 +577,7 @@ void removeEvidenceFromRoom(GhostEvidenceListType *list, EvidenceNodeType *evide
 
     // Iterate through the list, if we find the evidence at the next position, set the next to next next (jump over it)
     while(tempEvidence->next != NULL) {
+        // printf("remove evidence from room while\n");
         if(tempEvidence->next == evidence){
             //Prob need to free unless hunter uses it
             tempEvidence->next = tempEvidence->next->next;
@@ -580,6 +684,7 @@ GhostEvidenceListType* makeACopyOfPersonalEvidence(GhostEvidenceListType *toCopy
     // Iterate through the toCopyList and copy each piece of data and add it to the previous list made
     EvidenceNodeType *traverseNode = toCopyList->head;
     while(traverseNode != NULL){
+        // printf("copyPersonalEvidence while\n");
         EvidenceNodeType *tempEvNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
         tempEvNode->data = traverseNode->data;
         addEvidenceToHunter(copyListPtr, tempEvNode);
@@ -600,6 +705,7 @@ int checkIfDuplicate(GhostEvidenceListType *list, EvidenceNodeType* node){
     // Iterate through the nodes
     EvidenceNodeType *traverseNode = list->head;
     while(traverseNode != NULL){
+        // printf("checking duplicate while\n");
         // If at any point there exists a duplicate, return C_TRUE
         if(traverseNode->data->evidenceCategory == node->data->evidenceCategory && traverseNode->data->readingData == node->data->readingData){
             return C_TRUE;
@@ -617,9 +723,10 @@ int checkIfDuplicate(GhostEvidenceListType *list, EvidenceNodeType* node){
  * EvidenceType *evidence (in) used to print the evidence information
  ********************************************************************************************/
 void printEvidence(EvidenceType *evidence){
-    printf("\nPRINTING EVIDENCE\n");
-    printf("Type: %s", evidenceTypeToString(evidence->evidenceCategory));
-    printf("Reading Data: %f", evidence->readingData);
+    printf("  Type: %s\n", evidenceTypeToString(evidence->evidenceCategory));
+    printf("  Reading Data: %f\n", evidence->readingData);
+    printf("  %s\n\n", (isGhostly(evidence)) ? "IT IS GHOSTLY" : "");
+    
     
 }
 
@@ -633,6 +740,8 @@ void printHunter(HunterType* hunter){
     printf("Fear Timer: %d\n", hunter->fear);
     printf("Boredom Timer: %d\n", hunter->timer);
     printf("Evidence Type: %s\n", evidenceTypeToString(hunter->evidence));
+    printf("Evidence Collected:\n");
+    // printGhostEvidenceList(hunter->personalEvidence);
     printf("Hunter's Room: %s\n", hunter->room->name);
     // printRoom(hunter->room);
     // printGhostEvidenceList(hunter->personalEvidence);
@@ -642,9 +751,15 @@ void printHunter(HunterType* hunter){
  * printHunterList, prints the hunter list
  * HunterListType *list (in) used to print each node's data of the entire list
  ********************************************************************************************/
+
+
 void printHunterList(HunterListType *list) {
-    printf("Hunters\n");
+    printf("\nHunters\n");
     for(int i = 0; i < list->size; i++){
-        printf("  Name: %s\n", (list->hunterList[i]->name));
+        printf("\n  Name: %s\n", (list->hunterList[i]->name));
+        printf("   Room: %s\n", list->hunterList[i]->room->name);
+        printf("   Tool Type: %s\n", evidenceTypeToString(list->hunterList[i]->evidence));
+        printf("   Personal Evidence:\n");
+        printGhostEvidenceList(list->hunterList[i]->personalEvidence, "    ");
     }
 }
