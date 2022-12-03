@@ -65,7 +65,7 @@
 int main(int argc, char *argv[])
 {
     // Initialize a random seed for the random number generators
-    for(int p = 0; p<1000; p++){
+    for(int p = 0; p<1; p++){
         srand(time(NULL));
 
         //Ghost thread
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 
         }
 
-        // pthread_create(&pThreadghost, NULL, ghostThread, (void*) ghostPtr);
+        pthread_create(&pThreadghost, NULL, ghostThread, (void*) ghostPtr);
 
         for(int i = 0; i<MAX_HUNTERS; i++) {
             pthread_create(hunterThreadArray + i, NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
@@ -147,14 +147,15 @@ int main(int argc, char *argv[])
             pthread_join(hunterThreadArray[i], NULL);
         }
 
-        // pthread_join(pThreadghost, NULL);
+        pthread_join(pThreadghost, NULL);
+        
         printHunterList(hunterListPtr);
         
         RoomNodeType *traverseRoom = building.rooms->head;
-        // while(traverseRoom != NULL){
-        //     printf("Hunter in %s size: %d\n", traverseRoom->data->name, traverseRoom->data->hunters->size);
-        //     traverseRoom = traverseRoom->next;
-        // }
+        while(traverseRoom != NULL){
+            printf("Hunter in %s size: %d\n", traverseRoom->data->name, traverseRoom->data->hunters->size);
+            traverseRoom = traverseRoom->next;
+        }
 
         // printf("hunters fear:\n");
         // for(int i = 0; i < 4; i++){
@@ -190,8 +191,10 @@ int main(int argc, char *argv[])
         //     sem_destroy(&(roomHead->data->mutex));
         //     roomHead = roomHead->next;
         // }
+
+        
+        
     }
-    
     
 
 

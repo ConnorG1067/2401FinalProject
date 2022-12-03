@@ -122,6 +122,7 @@ void addRandomEvidence(GhostType*);
 int generateValueOnType(EvidenceClassType);
 void moveGhost(GhostType*);
 int checkGhostInRoom(GhostType*);
+int* getRandomEvidenceForGhost(GhostClassType);
 
 // HUNTER THREAD HELPERS
 int checkHunterWithGhost(HunterType*);
