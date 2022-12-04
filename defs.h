@@ -102,7 +102,7 @@ void initRoomList(RoomListType**);
 void initGhostList(GhostEvidenceListType *);
 void initGhost(GhostClassType, RoomType*, GhostType *);
 void initPersonalEvidence(GhostEvidenceListType* );
-void initHunter(char* , RoomType *, HunterType **);
+void initHunter(char* , RoomType *, int, HunterType **);
 
 
 // THREADS
@@ -115,6 +115,10 @@ void appendRoom(RoomListType*, RoomNodeType*);
 int addHunterToList(HunterListType*, HunterType*);
 int addHunterToRoom(RoomType*, HunterType*);
 RoomNodeType* getRandomRoom(RoomNodeType*);
+int getUniqueRandomEvidenceTool(int * , int *);
+
+
+void determineGhost(HunterListType*);
 
 // GHOST THREAD HELPERS
 void addRandomEvidence(GhostType*);
@@ -130,7 +134,7 @@ int communicateEvidence(HunterType*);
 void collectEvidence(HunterType*);
 int moveHunter(HunterType*);
 void addEvidenceToHunter(GhostEvidenceListType*, EvidenceNodeType*);
-void removeEvidenceFromRoom(GhostEvidenceListType *, EvidenceNodeType *);
+int removeEvidenceFromRoom(GhostEvidenceListType *, EvidenceNodeType *);
 int isGhostly(EvidenceType*);
 float generateStandardValue(EvidenceClassType);
 char* evidenceTypeToString(EvidenceClassType); 

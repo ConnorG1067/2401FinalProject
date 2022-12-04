@@ -5,7 +5,7 @@
  *  RoomType room (out), used to set parameters for the room
  *  char* name (in), the given name for the room
  ********************************************************************************************/
-void initRoom(RoomType *room, char *name) {
+void initRoom(RoomType *room, char *name){
     // Initalize the mutex
     sem_init(&(room->mutex), 0, 1);
 
@@ -63,7 +63,7 @@ void connectRooms(RoomType *room1, RoomType *room2){
  * RoomListType *roomList (out), the given list to append to
  * RoomNodeType *room (in), the given node to append to the list
  ********************************************************************************************/
-void appendRoom(RoomListType *roomList, RoomNodeType *room) {
+void appendRoom(RoomListType *roomList, RoomNodeType *room){
 
     // Setting the next to null
 	room->next = NULL;
@@ -85,7 +85,7 @@ void appendRoom(RoomListType *roomList, RoomNodeType *room) {
  * RoomType* room (out), the given room to append the hunter to
  * HunterType* hunter (in), the given hunter to add to the hunter list
  ********************************************************************************************/
-int addHunterToRoom(RoomType* room, HunterType* hunter) {
+int addHunterToRoom(RoomType* room, HunterType* hunter){
     // If the size is not greater than MAX_HUNTERS add the hunter to the room and return C_TRUE
     if(room->hunters->size<MAX_HUNTERS){
         room->hunters->hunterList[room->hunters->size++] = hunter;
@@ -103,7 +103,7 @@ int addHunterToRoom(RoomType* room, HunterType* hunter) {
  * printRoom, prints the rooms information to the terminal
  * RoomType *room (in), used to print the room information
  ********************************************************************************************/
-void printRoom(RoomType *room) {
+void printRoom(RoomType *room){
     printf("\nRoom\n");
     printf("Name: %s\n", room->name);
     printf("Connected Rooms:\n");
@@ -118,7 +118,7 @@ void printRoom(RoomType *room) {
  * printRoomList, prints a roomListType
  * RoomListType *roomList (in), used to print the room information
  ********************************************************************************************/
-void printRoomList(RoomListType *roomList) {
+void printRoomList(RoomListType *roomList){
     RoomNodeType *tempRoomNode = roomList->head;
 
     while(tempRoomNode != NULL){
@@ -127,6 +127,10 @@ void printRoomList(RoomListType *roomList) {
     }
 }
 
+/* *******************************************************************************************
+ * freeConnectedRooms, frees all the nodes in a RoomListType
+ * RoomListType *roomList (in), contains all the nodes to be freed
+ ********************************************************************************************/
 void freeConnectedRooms(RoomListType* list){
     RoomNodeType *tempNode;
 	while(list->head != NULL){
@@ -136,7 +140,11 @@ void freeConnectedRooms(RoomListType* list){
 	}
 }
 
-void freeRoomList(RoomListType *list) {
+/* *******************************************************************************************
+ * freeRoomList, frees all the data in a RoomListType
+ * RoomListType *roomList (in), contains all the data to be freed
+ ********************************************************************************************/
+void freeRoomList(RoomListType *list){
 	RoomNodeType *tempNode;
 	while(list->head != NULL){
 		tempNode = list->head;
@@ -148,6 +156,5 @@ void freeRoomList(RoomListType *list) {
         free(tempNode->data->hunters);
         free(tempNode->data);
 		free(tempNode);
-        
 	}
 }

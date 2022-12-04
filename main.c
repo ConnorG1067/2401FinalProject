@@ -5,9 +5,9 @@
 int main(int argc, char *argv[])
 {
     // Initialize a random seed for the random number generators
-    for(int p = 0; p<1000; p++){
-        srand(time(NULL));
+    for(int p = 0; p<1; p++){
 
+        srand(time(NULL));
 
         //Ghost thread
         pthread_t pThreadghost;
@@ -29,6 +29,11 @@ int main(int argc, char *argv[])
 
         RoomType* vanRoom = building.rooms->head->data;
         
+        int toolSize = MAX_HUNTERS;
+        int toolArray[MAX_HUNTERS] = {0,1,2,3};
+
+        
+
         for(int i = 0; i < MAX_HUNTERS; i++) {
             char name[MAX_STR];
             printf("%d. Hunter: \n", i+1);
@@ -36,7 +41,8 @@ int main(int argc, char *argv[])
             // scanf("%s", name);
         
             HunterType *currentHunterPtr;
-            initHunter(name, vanRoom, &currentHunterPtr);
+            initHunter(name, vanRoom, getUniqueRandomEvidenceTool(toolArray, &toolSize), &currentHunterPtr);
+            addHunterToRoom(vanRoom, currentHunterPtr);
             addHunterToList(hunterListPtr, currentHunterPtr);
             addHunterToList(building.hunters, currentHunterPtr);
             
@@ -64,7 +70,7 @@ int main(int argc, char *argv[])
 
         pthread_join(pThreadghost, NULL);
         
-    
+
 
         printf("\t----------------------------------------------------------------------------------------------------------------\n");
         printf("%55sFinal Results%35s\n", "", "");
@@ -94,9 +100,12 @@ int main(int argc, char *argv[])
             printf("\tBoredom: %-20d", currHunter->timer);
         }
 
-        
 
+        for(int i = 0; i<hunterListPtr->size; i++){
+            printHunter(hunterListPtr->hunterList[i]);
 
+        }
+    
         for(int i = 0; i<hunterListPtr->size; i++){
             freeHunter(hunterListPtr->hunterList[i]);
         }
@@ -105,12 +114,29 @@ int main(int argc, char *argv[])
         free(building.rooms);
         free(building.hunters);
         free(building.ghost);
-        
 
 
-        
-        
+            
+
+        // int fearCounter = 0;
+        // printf("hunters with fear >= 100:\n");
+        // for(int i = 0; i < hunterListPtr->size; i++){
+        //     if(hunterListPtr->hunterList[i]->fear >= 100){
+        //         printHunter(hunterListPtr->hunterList[i]);
+        //         fearCounter++;
+        //     }
+        // }
+
+        // if(fearCounter >= 4){
+        //     printf("The ghost won\n");
+        //     printGhost(ghostPtr);
+        // } else {
+        //     // determineGhost(hunterListPr);
+        // }
+
     }
+    
+
     return 0;
 }
 
@@ -140,5 +166,63 @@ float randFloat(float a, float b) {
     return random * (b - a) + a;
 }
 
+int getUniqueRandomEvidenceTool(int * arr, int *size){
+    // Creating a variable to avoid repeatedly dereferencing
+    int derefSize = *size;
 
+    // Selecting a randomIndex
+    int randomIndex = randInt(0, derefSize);
+    // Saving the value at the index
+    int valToReturn = arr[randomIndex];
+
+    // Removing the value which was randomly selected from the array
+    for(int i = 0; i<derefSize; i++){
+        if(arr[i] == valToReturn){
+            for(int j = i+1; j<derefSize; j++){
+                arr[j-1] = arr[j];
+            }
+        }
+    }
+
+    // Reduce the size of the array
+    (*size)--;
+
+    //Return the value
+    return valToReturn;
+}
+
+
+// void determineGhost(HunterListType *hunters){
+//     printf("DETERMINE THE GOD DAMN GHOST HERE\n");
+//     char EMFcheck = 0 
+//     char TEMPERATUREcheck =  0 
+//     char FINERPRINTScheck = 0 
+//     char SOUNDcheck = 0 
+
+//     for(int i = 0; i < hunters->size; i++){
+//         EvidenceNodeType *tempEvidenceNode = hunters->hunterList[i]->personalEvidence->head;
+//         while(tempEvidenceNode != NULL){
+//             if(isGhostly(tempEvidenceNode->data->readingData)){
+//                 switch(tempEvidenceNode->data->evidenceCategory){
+//                     case 0: // EMF
+//                         EMFcheck = 1;
+//                         break;
+//                     case 1: // TEMPERATURE
+//                         TEMPERATUREcheck = 1;
+//                         break;
+//                     case 2: // FINGERPRINTS
+//                         FINGERPRINTScheck = 1;
+//                         break;
+//                     case 3: // SOUND
+//                         SOUNDcheck = 1;
+//                         break;
+//                 }
+//             }
+//             tempEvidenceNode = tempEvidenceNode->next;
+//         }
+//     }
+// 
+//     
+//     return;
+// }
 
