@@ -76,7 +76,6 @@ void appendRoom(RoomListType *roomList, RoomNodeType *room) {
 	}else{
 		roomList->tail->next = room;
 		roomList->tail = room;
-
 	}
     return;
 }
@@ -110,7 +109,6 @@ void printRoom(RoomType *room) {
     printf("Connected Rooms:\n");
     printRoomList(room->connectedRooms);
     printf("Ghost Evidence List:\n");
-    // printGhostEvidenceList(room->evidenceList);
     (room->hunters->size==0) ? printf("Hunters: Empty\n") : printHunterList(room->hunters);
     printf("Ghost: ");
     room->ghost == NULL ? printf("None\n") : printGhost(room->ghost);
@@ -127,4 +125,29 @@ void printRoomList(RoomListType *roomList) {
         printf("\t%s\n", tempRoomNode->data->name);
         tempRoomNode = tempRoomNode->next;
     }
+}
+
+void freeConnectedRooms(RoomListType* list){
+    RoomNodeType *tempNode;
+	while(list->head != NULL){
+		tempNode = list->head;
+		list->head = list->head->next;
+        free(tempNode);
+	}
+}
+
+void freeRoomList(RoomListType *list) {
+	RoomNodeType *tempNode;
+	while(list->head != NULL){
+		tempNode = list->head;
+		list->head = list->head->next;
+        sem_destroy(&(tempNode->data->mutex));
+        freeEvidenceList(tempNode->data->evidenceList);
+        freeConnectedRooms(tempNode->data->connectedRooms);
+        free(tempNode->data->connectedRooms);
+        free(tempNode->data->hunters);
+        free(tempNode->data);
+		free(tempNode);
+        
+	}
 }

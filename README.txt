@@ -10,4 +10,3 @@ List of Files
 	- building.c
 	- hunters.c
 	- ghost.c
-	

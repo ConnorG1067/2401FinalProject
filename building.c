@@ -113,5 +113,6 @@ void populateRooms(BuildingType* building) {
 void initBuilding(BuildingType *building){
     building->ghost = (GhostType*) malloc(sizeof(GhostType));
     building->rooms = (RoomListType*) malloc(sizeof(RoomListType));
-    building->hunterListSize = 0; 
+    building->hunters = (HunterListType*) malloc(sizeof(HunterListType));
+    initHunterList(building->hunters);
 }

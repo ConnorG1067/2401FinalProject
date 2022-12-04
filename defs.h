@@ -87,8 +87,7 @@ typedef struct EvidenceType {
 
 typedef struct {
     GhostType* ghost;
-    HunterType* hunters[MAX_HUNTERS];
-    int hunterListSize;
+    HunterListType *hunters;
     RoomListType* rooms;
 } BuildingType;
 
@@ -119,10 +118,10 @@ RoomNodeType* getRandomRoom(RoomNodeType*);
 
 // GHOST THREAD HELPERS
 void addRandomEvidence(GhostType*);
-int generateValueOnType(EvidenceClassType);
+float generateGhostlyValueOnType(EvidenceClassType);
 void moveGhost(GhostType*);
 int checkGhostInRoom(GhostType*);
-int* getRandomEvidenceForGhost(GhostClassType);
+int getRandomEvidenceForGhost(GhostClassType);
 
 // HUNTER THREAD HELPERS
 int checkHunterWithGhost(HunterType*);
@@ -133,7 +132,7 @@ int moveHunter(HunterType*);
 void addEvidenceToHunter(GhostEvidenceListType*, EvidenceNodeType*);
 void removeEvidenceFromRoom(GhostEvidenceListType *, EvidenceNodeType *);
 int isGhostly(EvidenceType*);
-int generateStandardValue(EvidenceClassType);
+float generateStandardValue(EvidenceClassType);
 char* evidenceTypeToString(EvidenceClassType); 
 char* ghostTypeToString(GhostClassType ghost);
 GhostEvidenceListType* makeACopyOfPersonalEvidence(GhostEvidenceListType *);
@@ -141,15 +140,24 @@ int checkIfDuplicate(GhostEvidenceListType *, EvidenceNodeType*);
 void addEvidenceToRoom(GhostEvidenceListType *, EvidenceNodeType*);
 void removeHunterFromRoom(HunterType *);
 
-// PRINT STATEMENTS
+// PRINT FUNCTIONS
 void printHunter(HunterType*);
-void printGhost(GhostType*);
-void printGhostEvidenceList(GhostEvidenceListType*, char*);
-void printEvidence(EvidenceType*);
-void printRoom(RoomType*);
-void printRoomList(RoomListType*);
 void printHunterList(HunterListType*);
 
+void printGhost(GhostType*);
+void printGhostEvidenceList(GhostEvidenceListType*, char*);
 
-void printBuilding(BuildingType*);
+void printEvidence(EvidenceType*);
 
+void printRoom(RoomType*);
+void printRoomList(RoomListType*);
+
+// CLEANUP FUNCTIONS
+void freeHunter(HunterType *); 
+void freeGhost(GhostType *);
+void freeRoom(RoomType *);
+void freeEvidenceData(GhostEvidenceListType *);
+void freeEvidenceNodes(GhostEvidenceListType *);
+void freeEvidenceList(GhostEvidenceListType *);
+void freeRoomList(RoomListType *);
+void freeConnectedRooms(RoomListType*);
