@@ -103,7 +103,24 @@ int main(int argc, char *argv[])
 
         for(int i = 0; i<hunterListPtr->size; i++){
             printHunter(hunterListPtr->hunterList[i]);
+        }
 
+        int fearCounter = 0;
+        printf("hunters with fear >= 100:\n");
+        for(int i = 0; i < hunterListPtr->size; i++){
+            if(hunterListPtr->hunterList[i]->fear >= 100){
+                printHunter(hunterListPtr->hunterList[i]);
+                fearCounter++;
+            }
+        }
+
+        if(fearCounter >= 4){
+            printf("The ghost won\n");
+            printGhost(ghostPtr);
+        } else {
+            int speculatedGhost = 
+            printf("Speculated Ghost Type: %s\n", ghostTypeToString((GhostClassType)determineGhost(hunterListPtr)));
+            printf("Actual Ghost Type: %s\n", ghostTypeToString(ghostPtr->ghostType));  
         }
     
         for(int i = 0; i<hunterListPtr->size; i++){
@@ -114,25 +131,6 @@ int main(int argc, char *argv[])
         free(building.rooms);
         free(building.hunters);
         free(building.ghost);
-
-
-            
-
-        // int fearCounter = 0;
-        // printf("hunters with fear >= 100:\n");
-        // for(int i = 0; i < hunterListPtr->size; i++){
-        //     if(hunterListPtr->hunterList[i]->fear >= 100){
-        //         printHunter(hunterListPtr->hunterList[i]);
-        //         fearCounter++;
-        //     }
-        // }
-
-        // if(fearCounter >= 4){
-        //     printf("The ghost won\n");
-        //     printGhost(ghostPtr);
-        // } else {
-        //     // determineGhost(hunterListPr);
-        // }
 
     }
     
@@ -192,37 +190,48 @@ int getUniqueRandomEvidenceTool(int * arr, int *size){
 }
 
 
-// void determineGhost(HunterListType *hunters){
-//     printf("DETERMINE THE GOD DAMN GHOST HERE\n");
-//     char EMFcheck = 0 
-//     char TEMPERATUREcheck =  0 
-//     char FINERPRINTScheck = 0 
-//     char SOUNDcheck = 0 
+int determineGhost(HunterListType *hunters){
+    printf("DETERMINE THE GOD DAMN GHOST HERE\n");
+    int emfCheck = C_FALSE;
+    int temperatureCheck =  C_FALSE;
+    int fingerprintsCheck = C_FALSE;
+    int soundCheck = C_FALSE;
 
-//     for(int i = 0; i < hunters->size; i++){
-//         EvidenceNodeType *tempEvidenceNode = hunters->hunterList[i]->personalEvidence->head;
-//         while(tempEvidenceNode != NULL){
-//             if(isGhostly(tempEvidenceNode->data->readingData)){
-//                 switch(tempEvidenceNode->data->evidenceCategory){
-//                     case 0: // EMF
-//                         EMFcheck = 1;
-//                         break;
-//                     case 1: // TEMPERATURE
-//                         TEMPERATUREcheck = 1;
-//                         break;
-//                     case 2: // FINGERPRINTS
-//                         FINGERPRINTScheck = 1;
-//                         break;
-//                     case 3: // SOUND
-//                         SOUNDcheck = 1;
-//                         break;
-//                 }
-//             }
-//             tempEvidenceNode = tempEvidenceNode->next;
-//         }
-//     }
-// 
-//     
-//     return;
-// }
+    for(int i = 0; i < hunters->size; i++){
+        EvidenceNodeType *tempEvidenceNode = hunters->hunterList[i]->personalEvidence->head;
+        while(tempEvidenceNode != NULL){
+            if(isGhostly(tempEvidenceNode->data)){
+                switch(tempEvidenceNode->data->evidenceCategory){
+                    case 0: // EMF
+                        emfCheck = C_TRUE;
+                        break;
+                    case 1: // TEMPERATURE
+                        temperatureCheck = C_TRUE;
+                        break;
+                    case 2: // FINGERPRINTS
+                        fingerprintsCheck = C_TRUE;
+                        break;
+                    case 3: // SOUND
+                        soundCheck = C_TRUE;
+                        break;
+                }
+            }
+            tempEvidenceNode = tempEvidenceNode->next;
+        }
+    }
+
+    if(emfCheck && temperatureCheck && fingerprintsCheck){
+        return POLTERGEIST;
+    }else if(emfCheck && temperatureCheck && soundCheck){
+        return BANSHEE;
+    }else if(emfCheck && fingerprintsCheck && soundCheck){
+        return BULLIES;
+    }else if(temperatureCheck && fingerprintsCheck && soundCheck){
+        return PHANTOM;
+    }else{
+        return UNKNOWN_GHOST;
+    }
+
+    
+}
 

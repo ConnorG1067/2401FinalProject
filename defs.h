@@ -21,6 +21,7 @@
 #define C_MISC_ERROR       -1
 #define C_NO_ROOM_ERROR    -2
 #define C_ARR_ERROR        -3
+#define UNKNOWN_GHOST      -4
 
 
 // You may rename these types if you wish
@@ -118,7 +119,7 @@ RoomNodeType* getRandomRoom(RoomNodeType*);
 int getUniqueRandomEvidenceTool(int * , int *);
 
 
-void determineGhost(HunterListType*);
+int determineGhost(HunterListType*);
 
 // GHOST THREAD HELPERS
 void addRandomEvidence(GhostType*);

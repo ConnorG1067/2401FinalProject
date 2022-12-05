@@ -102,7 +102,7 @@ void *hunterThread(void *arg) {
             case 1:
                 // Move
                 moveHunter(hThreadHunter);
-                // printf("ROOM AFTER MOVE: %s\n", hThreadHunter->room->name);
+                printf("ROOM AFTER MOVE: %s\n", hThreadHunter->room->name);
                 break;
             case 2:
                 // printf("OUTSIDE COMMUNICATE\n");

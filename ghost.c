@@ -135,7 +135,7 @@ void addRandomEvidence(GhostType *currentGhost) {
 
     // Pick a random evidenceCategory
     int randomEvidence = (getRandomEvidenceForGhost(currentGhost->ghostType));
-
+    // printf("Evidence generated: %s\n", evidenceTypeToString(randomEvidence))
 
     newEvidencePtr->evidenceCategory = (EvidenceClassType) randomEvidence;
     
@@ -254,6 +254,9 @@ char* ghostTypeToString(GhostClassType ghost){
             break;
         case PHANTOM:
             return "PHANTOM";
+            break;
+        default:
+            return "UNKNOWN";
             break;
     }
 }
