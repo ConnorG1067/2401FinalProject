@@ -173,11 +173,7 @@ void removeHunterFromRoom(HunterType *hunter, int lockBool){
  ********************************************************************************************/
 int checkHunterWithGhost(HunterType *currentHunter) { 
     // If the hunter's room's ghost is NOT null, return C_TRUE
-    if(currentHunter->room->ghost != NULL) {
-        return C_TRUE;
-    }
-    // Otherwise return C_FALSE
-    return C_FALSE;
+    return (currentHunter->room->ghost != NULL) ? C_TRUE : C_FALSE;
 }
 
 /* *******************************************************************************************
