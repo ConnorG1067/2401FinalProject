@@ -1,162 +1,142 @@
-
 #include "defs.h"
 
+int main(int argc, char *argv[]){
 
-int main(int argc, char *argv[])
-{
+    int hunterSleepTime = 0;
+    int ghostSleepTime = 0;
+    if(argc == 3){
+        hunterSleepTime = atoi(argv[1]);
+        ghostSleepTime = atoi(argv[2]);
+    }
     // Initialize a random seed for the random number generators
-    for(int p = 0; p<1; p++){
+    srand(time(NULL));
 
-        srand(time(NULL));
+    //Ghost thread
+    pthread_t pThreadghost;
 
-        //Ghost thread
-        pthread_t pThreadghost;
+    // Initialize the building
+    BuildingType building;
+    initBuilding(&building);
+    populateRooms(&building);
 
-        // You may change this code; this is for demonstration purposes
-        BuildingType building;
-        initBuilding(&building);
-        populateRooms(&building);
+    // Create list of hunters
+    HunterListType hunterList;
+    HunterListType* hunterListPtr = &hunterList;
+    initHunterList(hunterListPtr);
 
+    // Ghost 
+    initGhost(randInt(0,4), getRandomRoom(building.rooms->head)->data, ghostSleepTime, building.ghost);
+    GhostType *ghostPtr = building.ghost;
 
-        //Place hunters
-        HunterListType hunterList;
-        HunterListType* hunterListPtr = &hunterList;
-        initHunterList(hunterListPtr);
-
-        // Ghost 
-        initGhost(randInt(0,4), getRandomRoom(building.rooms->head)->data, building.ghost);
-        GhostType *ghostPtr = building.ghost;
-
-        RoomType* vanRoom = building.rooms->head->data;
-        
-        int toolSize = MAX_HUNTERS;
-        int toolArray[MAX_HUNTERS] = {0,1,2,3};
-
-        
-
-        for(int i = 0; i < MAX_HUNTERS; i++) {
-            char name[MAX_STR];
-            printf("%d. Hunter: \n", i+1);
-            sprintf(name, "%d", i+1);
-            // scanf("%s", name);
-        
-            HunterType *currentHunterPtr;
-            initHunter(name, vanRoom, getUniqueRandomEvidenceTool(toolArray, &toolSize), &currentHunterPtr);
-            addHunterToRoom(vanRoom, currentHunterPtr);
-            addHunterToList(hunterListPtr, currentHunterPtr);
-            addHunterToList(building.hunters, currentHunterPtr);
-            
-        }
-
-
-        //Populate a hunter thread array
-        pthread_t hunterThreadArray[MAX_HUNTERS];
-        for(int i = 0; i<MAX_HUNTERS; i++){
-            pthread_t currentThread;
-            hunterThreadArray[i] = currentThread;
-
-        }
-
-        pthread_create(&pThreadghost, NULL, ghostThread, (void*) ghostPtr);
-
-        for(int i = 0; i<MAX_HUNTERS; i++) {
-            pthread_create(hunterThreadArray + i, NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
-        }
-
-
-        for(int i = 0; i<MAX_HUNTERS; i++) {
-            pthread_join(hunterThreadArray[i], NULL);
-        }
-
-        pthread_join(pThreadghost, NULL);
-        
-
-
-        printf("\t----------------------------------------------------------------------------------------------------------------\n");
-        printf("%55sFinal Results%35s\n", "", "");
-        printf("\t----------------------------------------------------------------------------------------------------------------\n");
-        for(int i = 0; i<hunterListPtr->size; i++){
-            HunterType *currHunter = hunterListPtr->hunterList[i];
-            printf("\tName: %-25s", currHunter->name);
-        }
-        printf("\n");
-        for(int i = 0; i<hunterListPtr->size; i++){
-            HunterType *currHunter = hunterListPtr->hunterList[i];
-            printf("\tEvidence: %-20s", evidenceTypeToString(currHunter->evidence));
-        }
-        printf("\n");
-        for(int i = 0; i<hunterListPtr->size; i++){
-            HunterType *currHunter = hunterListPtr->hunterList[i];
-            printf("\tRoom: %-25s", currHunter->room->name);
-        }
-        printf("\n");
-        for(int i = 0; i<hunterListPtr->size; i++){
-            HunterType *currHunter = hunterListPtr->hunterList[i];
-            printf("\tfear: %-25d", currHunter->fear);
-        }
-        printf("\n");
-        for(int i = 0; i<hunterListPtr->size; i++){
-            HunterType *currHunter = hunterListPtr->hunterList[i];
-            printf("\tBoredom: %-20d", currHunter->timer);
-        }
-
-
-        for(int i = 0; i<hunterListPtr->size; i++){
-            printHunter(hunterListPtr->hunterList[i]);
-        }
-
-        int fearCounter = 0;
-        printf("hunters with fear >= 100:\n");
-        for(int i = 0; i < hunterListPtr->size; i++){
-            if(hunterListPtr->hunterList[i]->fear >= 100){
-                printHunter(hunterListPtr->hunterList[i]);
-                fearCounter++;
-            }
-        }
-
-        if(fearCounter >= 4){
-            printf("The ghost won\n");
-            printGhost(ghostPtr);
-        } else {
-            int speculatedGhost = 
-            printf("Speculated Ghost Type: %s\n", ghostTypeToString((GhostClassType)determineGhost(hunterListPtr)));
-            printf("Actual Ghost Type: %s\n", ghostTypeToString(ghostPtr->ghostType));  
-        }
+    RoomType* vanRoom = building.rooms->head->data;
     
-        for(int i = 0; i<hunterListPtr->size; i++){
-            freeHunter(hunterListPtr->hunterList[i]);
-        }
+    // Hunters
+    int toolSize = MAX_HUNTERS;
+    int toolArray[MAX_HUNTERS] = {0,1,2,3};
 
-        freeRoomList(building.rooms);
-        free(building.rooms);
-        free(building.hunters);
-        free(building.ghost);
+    for(int i = 0; i < MAX_HUNTERS; i++) {
+        char name[MAX_STR];
+        printf("%d. Hunter: \n", i+1);
+        // Input the name
+        scanf("%s", name);
+    
+        // Make a new hunter
+        HunterType *currentHunterPtr;
+        // Initalize the hunter with their name, the van, a unique random tool, and the address
+        initHunter(name, vanRoom, getUniqueRandomEvidenceTool(toolArray, &toolSize), hunterSleepTime, &currentHunterPtr);
+        //Adding the hunters to the van, the main control flow list, and the building
+        addHunterToRoom(vanRoom, currentHunterPtr);
+        addHunterToList(hunterListPtr, currentHunterPtr);
+        addHunterToList(building.hunters, currentHunterPtr);
+    }
 
+    // Populate the hunter thread array
+    pthread_t hunterThreadArray[MAX_HUNTERS];
+    for(int i = 0; i<MAX_HUNTERS; i++){
+        pthread_t currentThread;
+        hunterThreadArray[i] = currentThread;
     }
     
+
+    // Create ghost thread
+    pthread_create(&pThreadghost, NULL, ghostThread, (void*) ghostPtr);
+
+    // Create hunter threads
+    for(int i = 0; i<MAX_HUNTERS; i++) {
+        pthread_create(hunterThreadArray + i, NULL, hunterThread, (void*) hunterListPtr->hunterList[i]);
+    }
+
+    // Join hunter threads
+    for(int i = 0; i<MAX_HUNTERS; i++) {
+        pthread_join(hunterThreadArray[i], NULL);
+    }
+
+    // Join ghost threads
+    pthread_join(pThreadghost, NULL);
+    
+
+
+    // Print each hunter
+    for(int i = 0; i<hunterListPtr->size; i++){
+        printHunter(hunterListPtr->hunterList[i]);
+    }
+
+    // Gets the number of hunters with a fear greater than or equal to 100 & prints them
+    printf("\n\nhunters with fear >= 100:\n");
+    int fearCounter = getFear(hunterListPtr);
+    // Determine the winner
+    determineWinner(hunterListPtr, ghostPtr, fearCounter);
+
+    // Free each hunter created with all their dynamically allocated memory
+    for(int i = 0; i<hunterListPtr->size; i++){
+        freeHunter(hunterListPtr->hunterList[i]);
+    }
+
+    // Free the rooms of the building
+    freeRoomList(building.rooms);
+
+    // Free the building data
+    free(building.rooms);
+    free(building.hunters);
+    free(building.ghost);
 
     return 0;
 }
 
-/*
-  Function:  randInt
-  Purpose:   returns a pseudo randomly generated number, 
-             in the range min to (max - 1), inclusively
-       in:   upper end of the range of the generated number
-   return:   randomly generated integer in the range [min, max-1) 
-*/
-int randInt(int min, int max)
-{
+/* ********************************************************************************************************************************
+ * getFear, gets the number of hunters with max fear
+ * int a (in), min value
+ * int b (in), max value
+ **********************************************************************************************************************************/
+int getFear(HunterListType *hunterListPtr){
+    int fearCounter = 0;
+    // Iterate through the hunter list
+    for(int i = 0; i < hunterListPtr->size; i++){
+        // If the current hunter has their fear maxed print the hunter and increase the fearCounter
+        if(hunterListPtr->hunterList[i]->fear >= MAX_FEAR){
+            printHunter(hunterListPtr->hunterList[i]);
+            fearCounter++;
+        }
+    }
+
+    // Return the fear counter
+    return fearCounter;
+}
+
+/* ********************************************************************************************************************************
+ * randInt, returns a random integer between a and b-1
+ * int a (in), min value
+ * int b (in), max value
+ **********************************************************************************************************************************/
+int randInt(int min, int max) {
     return rand() % (max - min) + min;
 }
 
-/*
-  Function:  randFloat
-  Purpose:   returns a pseudo randomly generated number, 
-             in the range min to max, inclusively
-       in:   upper end of the range of the generated number
-   return:   randomly generated integer in the range [0, max-1) 
-*/
+/* ********************************************************************************************************************************
+ * randFloat, returns a random float between a and b-1
+ * float a (in), min value
+ * float b (in), max value
+ **********************************************************************************************************************************/
 float randFloat(float a, float b) {
     // Get a percentage between rand() and the maximum
     float random = ((float) rand()) / (float) RAND_MAX;
@@ -164,7 +144,13 @@ float randFloat(float a, float b) {
     return random * (b - a) + a;
 }
 
-int getUniqueRandomEvidenceTool(int * arr, int *size){
+
+/* ********************************************************************************************************************************
+ * getUniqueRandomEvidenceTool, finds a unique piece of evidence from a list, removes it from the list then returns what was found
+ * int *arr (in), the list of pieces of evidence
+ * int *size (in), the size of arr
+ **********************************************************************************************************************************/
+int getUniqueRandomEvidenceTool(int *arr, int *size) {
     // Creating a variable to avoid repeatedly dereferencing
     int derefSize = *size;
 
@@ -189,9 +175,11 @@ int getUniqueRandomEvidenceTool(int * arr, int *size){
     return valToReturn;
 }
 
-
-int determineGhost(HunterListType *hunters){
-    printf("DETERMINE THE GOD DAMN GHOST HERE\n");
+/* ********************************************************************************************************************************
+ * determineGhost, calculates which ghost was found using the hunters' collected evidence and returns it
+ * HunterListType *hunters (in), the list of hunters
+ **********************************************************************************************************************************/
+int determineGhost(HunterListType *hunters) {
     int emfCheck = C_FALSE;
     int temperatureCheck =  C_FALSE;
     int fingerprintsCheck = C_FALSE;
@@ -231,7 +219,31 @@ int determineGhost(HunterListType *hunters){
     }else{
         return UNKNOWN_GHOST;
     }
-
-    
 }
 
+/* ********************************************************************************************************************************
+ * determineWinner, prints which case has occured
+ * HunterListType *list (in), the list of hunters to determine the ghost
+ * GhostType *ghost (in), the ghost in the building
+ * int fear (in), the number of players who have max fear
+ **********************************************************************************************************************************/
+void determineWinner(HunterListType *list, GhostType *ghost, int fear){
+    // If the fear is greater than four, all hunters have max fear and the ghost won
+    if(fear >= 4){
+        printf("The ghost won\n");
+        printGhost(ghost);
+    // Other wise the hunters may have won
+    } else {
+        // Get the speculatedGhost from determineGhost
+        GhostClassType speculatedGhost = (GhostClassType) determineGhost(list);
+        // If the value of speculatedGhost is NOT UNKNOWN_GHOST then we've guessed the ghost type correctly
+        if(speculatedGhost != UNKNOWN_GHOST){
+            // Print the speculated type and the actual type
+            printf("Speculated Ghost Type: %s\n", ghostTypeToString(speculatedGhost));
+            printf("Actual Ghost Type: %s\n", ghostTypeToString(ghost->ghostType));  
+        // If the ghost is UNKNOWN_GHOST let the user know that not enough evidence was collected
+        }else{
+            printf("There was not enough ghostly evidence collected to determine the ghost\n");
+        }
+    }
+}

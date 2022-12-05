@@ -16,9 +16,11 @@ void initRoom(RoomType *room, char *name){
     room->connectedRooms = (RoomListType*) malloc(sizeof(RoomListType));
     initRoomList(&room->connectedRooms);
 
+    // Evidence list for the room
     room->evidenceList = (GhostEvidenceListType*) malloc(sizeof(GhostEvidenceListType));
     initGhostList(room->evidenceList);
 
+    // Hunter list for the room
     room->hunters = (HunterListType*) malloc(sizeof(HunterListType));
     initHunterList(room->hunters);
 
@@ -31,6 +33,7 @@ void initRoom(RoomType *room, char *name){
  *  RoomListType **roomList (out), used to set the head and tail of the list to NULL
  ********************************************************************************************/
 void initRoomList(RoomListType **roomList){
+    // Initalize the given roomList
     (*roomList)->head = NULL;
     (*roomList)->tail = NULL;
 }
@@ -64,7 +67,6 @@ void connectRooms(RoomType *room1, RoomType *room2){
  * RoomNodeType *room (in), the given node to append to the list
  ********************************************************************************************/
 void appendRoom(RoomListType *roomList, RoomNodeType *room){
-
     // Setting the next to null
 	room->next = NULL;
 	
@@ -77,7 +79,6 @@ void appendRoom(RoomListType *roomList, RoomNodeType *room){
 		roomList->tail->next = room;
 		roomList->tail = room;
 	}
-    return;
 }
 
 /* *******************************************************************************************
@@ -111,7 +112,7 @@ void printRoom(RoomType *room){
     printf("Ghost Evidence List:\n");
     (room->hunters->size==0) ? printf("Hunters: Empty\n") : printHunterList(room->hunters);
     printf("Ghost: ");
-    room->ghost == NULL ? printf("None\n") : printGhost(room->ghost);
+    room->ghost == NULL ? printf("N/A\n") : printGhost(room->ghost);
 }
 
 /* *******************************************************************************************

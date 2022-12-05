@@ -1,3 +1,4 @@
+// Include defs.h
 #include "defs.h"
 
 
@@ -7,10 +8,11 @@
  * RoomType *room (in) the room the ghost exists in
  * GhostType *ghost (out), the ghost pointer to set for each initalization
  ********************************************************************************************/
-void initGhost(GhostClassType ghostType, RoomType *room, GhostType *ghost) {
+void initGhost(GhostClassType ghostType, RoomType *room, int sleepTime, GhostType *ghost) {
     ghost->ghostType = ghostType;
     ghost->room = room;
     ghost->boredomTimer = BOREDOM_MAX;
+    ghost->sleepTime = sleepTime;
 }
 
 /* *******************************************************************************************
@@ -18,6 +20,7 @@ void initGhost(GhostClassType ghostType, RoomType *room, GhostType *ghost) {
  * GhostEvidenceListType *ghostEvidenceList (out), used to set the head & tail to NULL
  ********************************************************************************************/
 void initGhostList(GhostEvidenceListType *ghostEvidenceList){
+    // Initalize the head & tail to NULL
     ghostEvidenceList->head = NULL;
     ghostEvidenceList->tail = NULL;
 }
@@ -27,7 +30,6 @@ void initGhostList(GhostEvidenceListType *ghostEvidenceList){
  * RoomNodeType *head (in), given the head find a random room for the ghost
  ********************************************************************************************/
 RoomNodeType* getRandomRoom(RoomNodeType *head){
-
     // Generate a random int from 1-TOTAL_ROOMS (do not include 0, because that is the van)
     int randomRoomInt = randInt(1, TOTAL_ROOMS);
     RoomNodeType *traverseRoomNode = head;
@@ -48,6 +50,7 @@ void *ghostThread(void *arg) {
     GhostType *ghostPtr = (GhostType*) arg;
     // Repeat some events while the ghost is not bored
     while(ghostPtr->boredomTimer > 0) {
+        sleep(ghostPtr->sleepTime);
         // The ghost and hunter appear in the same room
         if(checkGhostInRoom(ghostPtr)){
             // The ghost can either do nothing or add some random evidence
@@ -89,6 +92,7 @@ void *ghostThread(void *arg) {
 
 int getRandomEvidenceForGhost(GhostClassType ghostType){
     int ghostPtrArr[3];
+    // Creates an array containing three integers which depend on what the possible evidence types are for the given ghost
     switch(ghostType){
         case POLTERGEIST:
             {
@@ -119,6 +123,7 @@ int getRandomEvidenceForGhost(GhostClassType ghostType){
             }
             break;
     }
+    // Return a random value from the newly created array
     return ghostPtrArr[randInt(0,3)];
 }
 
@@ -148,6 +153,7 @@ void addRandomEvidence(GhostType *currentGhost) {
     
 	addEvidenceToRoom(currentGhost->room->evidenceList, evidenceNode);
     printf("Ghost added %s %f to %s\n", evidenceTypeToString(evidenceNode->data->evidenceCategory), evidenceNode->data->readingData, currentGhost->room->name);
+
     sem_post(&(currentGhost->room->mutex));
 }
 
@@ -158,16 +164,14 @@ void addRandomEvidence(GhostType *currentGhost) {
  ********************************************************************************************/
 void addEvidenceToRoom(GhostEvidenceListType *list, EvidenceNodeType* evidenceNode){
     evidenceNode->next = NULL;
-    // if (!checkIfDuplicate(list, evidenceNode)){
-        if(list->head == NULL){
-            list->head = evidenceNode;
-            list->tail = evidenceNode;
-        }else{
-            list->tail->next = evidenceNode;
-            list->tail = evidenceNode;
-        }
-    // }
-    
+    if(list->head == NULL){ // If list is empty
+        list->head = evidenceNode;
+        list->tail = evidenceNode;
+    }else{  // If list has at least one element
+        // Add to the end
+        list->tail->next = evidenceNode;
+        list->tail = evidenceNode;
+    }
 }
 
 /* *******************************************************************************************
@@ -192,7 +196,6 @@ float generateGhostlyValueOnType(EvidenceClassType evidenceType){
             break;
     }
 
-    // printf("RETURNING C_MISC_ERROR ghostvalue\n");
     return C_MISC_ERROR;
 }
 
@@ -210,7 +213,6 @@ void moveGhost(GhostType *currentGhost){
     }
     
     // Picks a random integer between 0 and the size of the adjacent rooms
-
     int randomNodeInt = randInt(0,sizeCounter);
     RoomNodeType *tempRoom = currentGhost->room->connectedRooms->head;
     for(int i = 0; i < randomNodeInt; i++) {
@@ -224,10 +226,7 @@ void moveGhost(GhostType *currentGhost){
     currentGhost->room = tempRoom->data;
     // Updates the room of the ghost
     currentGhost->room->ghost = currentGhost;
-    // sem_post(&(currentGhost->room->mutex));
-    // sem_post(&(tempRoom->data->mutex));
 }
-
 
 /* *******************************************************************************************
  * checkGhostInRoom, given a ghost, check if there are hunters in its room
@@ -272,7 +271,6 @@ void printGhost(GhostType *ghost){
     printf("Room: %s\n", ghost->room->name);
     printf("Boredom Timer: %d\n", ghost->boredomTimer);
 }
-
 
 /* *******************************************************************************************
  * printGhostEvidenceList, given a ghostEvidenceList print its evidence

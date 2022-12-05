@@ -58,12 +58,14 @@ typedef struct HunterType {
   char name[MAX_STR];
   int fear;   // Init to zero
   int timer;  // Init to BOREDOM_MAX
+  int sleepTime;
 } HunterType;
 
 typedef struct GhostType{
   GhostClassType ghostType;
   struct RoomType *room;
   int boredomTimer; // initialize to BOREDOM_MAX
+  int sleepTime;
 } GhostType;
 
 typedef struct RoomType{
@@ -92,6 +94,10 @@ typedef struct {
     RoomListType* rooms;
 } BuildingType;
 
+// THREADS
+void *ghostThread(void*);
+void *hunterThread(void*);
+
 // PROVIDED FUNTIONS
 void populateRooms(BuildingType*);
 
@@ -101,14 +107,9 @@ void initBuilding(BuildingType*);
 void initRoom(RoomType*, char*);
 void initRoomList(RoomListType**);
 void initGhostList(GhostEvidenceListType *);
-void initGhost(GhostClassType, RoomType*, GhostType *);
+void initGhost(GhostClassType, RoomType*, int, GhostType *);
 void initPersonalEvidence(GhostEvidenceListType* );
-void initHunter(char* , RoomType *, int, HunterType **);
-
-
-// THREADS
-void *ghostThread();
-void *hunterThread();
+void initHunter(char* , RoomType *, int, int, HunterType **);
 
 // MISC FUNCTIONS
 void connectRooms(RoomType*, RoomType*);
@@ -117,9 +118,10 @@ int addHunterToList(HunterListType*, HunterType*);
 int addHunterToRoom(RoomType*, HunterType*);
 RoomNodeType* getRandomRoom(RoomNodeType*);
 int getUniqueRandomEvidenceTool(int * , int *);
-
-
 int determineGhost(HunterListType*);
+int getFear(HunterListType *);
+void determineWinner(HunterListType *, GhostType*, int);
+
 
 // GHOST THREAD HELPERS
 void addRandomEvidence(GhostType*);
@@ -132,7 +134,7 @@ int getRandomEvidenceForGhost(GhostClassType);
 int checkHunterWithGhost(HunterType*);
 int containsThreeEvidence(HunterType*);
 int communicateEvidence(HunterType*);
-void collectEvidence(HunterType*);
+int collectEvidence(HunterType*);
 int moveHunter(HunterType*);
 void addEvidenceToHunter(GhostEvidenceListType*, EvidenceNodeType*);
 int removeEvidenceFromRoom(GhostEvidenceListType *, EvidenceNodeType *);
@@ -143,17 +145,14 @@ char* ghostTypeToString(GhostClassType ghost);
 GhostEvidenceListType* makeACopyOfPersonalEvidence(GhostEvidenceListType *);
 int checkIfDuplicate(GhostEvidenceListType *, EvidenceNodeType*);
 void addEvidenceToRoom(GhostEvidenceListType *, EvidenceNodeType*);
-void removeHunterFromRoom(HunterType *);
+void removeHunterFromRoom(HunterType *, int);
 
 // PRINT FUNCTIONS
 void printHunter(HunterType*);
 void printHunterList(HunterListType*);
-
 void printGhost(GhostType*);
 void printGhostEvidenceList(GhostEvidenceListType*, char*);
-
 void printEvidence(EvidenceType*);
-
 void printRoom(RoomType*);
 void printRoomList(RoomListType*);
 
