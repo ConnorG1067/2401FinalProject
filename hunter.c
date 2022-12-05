@@ -448,7 +448,6 @@ int removeEvidenceFromRoom(GhostEvidenceListType *list, EvidenceNodeType *eviden
             free(freeNode->data);
             tempEvidence->next = tempEvidence->next->next;
             free(freeNode);
-            // printGhostEvidenceList(list, "   ");
             return C_TRUE;
         }
         // Allow for looping
