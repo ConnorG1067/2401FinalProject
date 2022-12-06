@@ -359,26 +359,15 @@ int collectEvidence(HunterType *currentHunter) {
     while(tempEvidence != NULL) {
         // If the currentHunters tool matches that of the type of the evidenceType AND the evidence does not already exist in the personalEvidence list
         if(tempEvidence->data->evidenceCategory == currentHunter->evidence) {
-             // Alloc
-            EvidenceNodeType *newEvidenceNode = (EvidenceNodeType*) malloc(sizeof(EvidenceNodeType));
-            EvidenceType *newEvidence = (EvidenceType*) malloc(sizeof(EvidenceType));
-
-            // Set new evidence
-            newEvidence->readingData = tempEvidence->data->readingData;
-            newEvidence->evidenceCategory = tempEvidence->data->evidenceCategory;
-
-            // Set the nodes data
-            newEvidenceNode->data = newEvidence;
-
             // Reset the hunter boredom timer if evidence detected is ghostly
             if(isGhostly(tempEvidence->data)) {
                 currentHunter->timer = BOREDOM_MAX;
             }
 
             //Add the evidence to the hunters list and remove it from the rooms list
-            addEvidenceToHunter(currentHunter->personalEvidence, newEvidenceNode);
-            printf("%s found %s %f in %s (Droped by the ghost)\n", currentHunter->name, evidenceTypeToString(newEvidenceNode->data->evidenceCategory), newEvidenceNode->data->readingData, currentHunter->room->name);
             removeEvidenceFromRoom(currentHunter->room->evidenceList, tempEvidence);
+            addEvidenceToHunter(currentHunter->personalEvidence, tempEvidence);
+            printf("%s found %s %f in %s (Dropped by the ghost)\n", currentHunter->name, evidenceTypeToString(tempEvidence->data->evidenceCategory), tempEvidence->data->readingData, currentHunter->room->name);
             return C_TRUE;
         }
         // Allow for looping
@@ -424,10 +413,10 @@ int removeEvidenceFromRoom(GhostEvidenceListType *list, EvidenceNodeType *eviden
     
     // If the evidence and the head are equal, disconnect the head (remove it)
     if(evidence == list->head){
-        free(list->head->data);
+        // free(list->head->data);
         EvidenceNodeType *freeNode = list->head;
         list->head = list->head->next;
-        free(freeNode);
+        // free(freeNode);
         return C_TRUE;
     }
 
@@ -436,18 +425,18 @@ int removeEvidenceFromRoom(GhostEvidenceListType *list, EvidenceNodeType *eviden
         if(tempEvidence->next == evidence){
             // If the next item is the evidence to remove & that evidence is the tail disconnect the tail
             if(tempEvidence->next == list->tail){
-                free(list->tail->data);
+                // free(list->tail->data);
                 EvidenceNodeType *freeNode = list->tail;
                 list->tail = tempEvidence;
                 tempEvidence->next = NULL;
-                free(freeNode);
+                // free(freeNode);
                 return C_TRUE;
             }
             // Otherwise, it must be in the body of the list
             EvidenceNodeType *freeNode = tempEvidence->next;
-            free(freeNode->data);
+            // free(freeNode->data);
             tempEvidence->next = tempEvidence->next->next;
-            free(freeNode);
+            // free(freeNode);
             return C_TRUE;
         }
         // Allow for looping
